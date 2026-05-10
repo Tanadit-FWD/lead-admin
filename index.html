@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FWD Lead Admin</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <aside class="admin-sidebar" aria-label="เมนูแอดมิน">
+        <a class="admin-brand" href="index.html">
+          <span>FWD</span>
+          <small>Lead Admin</small>
+        </a>
+        <nav>
+          <a href="#overview">ภาพรวม</a>
+          <a href="#leads">Leads กลาง</a>
+          <a href="#team">ลูกทีม</a>
+          <a href="#sources">แหล่งข้อมูล</a>
+        </nav>
+        <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1LzNAXK27a87ydnKd-WY3lDL8Pool29RR8zxAEy2vaPQ/edit" target="_blank" rel="noreferrer">เปิดชีตกลาง</a>
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-top" id="overview">
+          <div>
+            <span class="eyebrow">Central Lead Distribution</span>
+            <h1>หน้าแอดมินแจกจ่าย Leads</h1>
+            <p>รวม lead จากหลายชีตไว้ที่เดียว กรองตามสถานะ/แหล่งที่มา แล้วแจกให้ลูกทีมได้ทันที</p>
+          </div>
+          <div class="admin-actions">
+            <a class="ghost-btn" href="index.html">กลับหน้าเว็บ</a>
+            <button class="primary-btn" id="sync-sources" type="button">Sync 4 ชีต</button>
+          </div>
+        </header>
+
+        <section class="connect-panel" aria-labelledby="connect-title">
+          <div>
+            <h2 id="connect-title">เชื่อม Apps Script</h2>
+            <p>วาง Web App URL หลัง deploy `apps-script/Code.gs` แล้วระบบจะอ่าน/เขียนข้อมูลจาก Google Sheet กลาง</p>
+          </div>
+          <div class="connect-form">
+            <input id="central-api-url" type="url" placeholder="Apps Script Web App URL" />
+            <button class="secondary-btn" id="save-api-url" type="button">บันทึก</button>
+            <button class="ghost-btn" id="refresh-central" type="button">Refresh</button>
+            <span class="sync-status" id="sync-status">Local mode</span>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="สรุป leads">
+          <article>
+            <span>Leads ทั้งหมด</span>
+            <strong id="metric-total">0</strong>
+          </article>
+          <article>
+            <span>รอแจก</span>
+            <strong id="metric-new">0</strong>
+          </article>
+          <article>
+            <span>แจกแล้ว</span>
+            <strong id="metric-assigned">0</strong>
+          </article>
+          <article>
+            <span>ลูกทีม active</span>
+            <strong id="metric-team">0</strong>
+          </article>
+        </section>
+
+        <section class="workspace-grid">
+          <section class="panel lead-workspace" id="leads" aria-labelledby="lead-title">
+            <div class="panel-heading">
+              <div>
+                <h2 id="lead-title">Leads กลาง</h2>
+                <p id="lead-summary">เลือก lead เพื่อดูรายละเอียด หรือแจกงานให้ลูกทีม</p>
+              </div>
+              <button class="ghost-btn" id="clear-filters" type="button">ล้างตัวกรอง</button>
+            </div>
+
+            <div class="filters">
+              <input id="search-input" type="search" placeholder="ค้นหา ชื่อ / เบอร์ / LINE / แผน" />
+              <select id="status-filter">
+                <option value="all">ทุกสถานะ</option>
+                <option value="New">New</option>
+                <option value="Assigned">Assigned</option>
+                <option value="Contacted">Contacted</option>
+                <option value="Follow Up">Follow Up</option>
+                <option value="Closed">Closed</option>
+                <option value="Duplicate">Duplicate</option>
+              </select>
+              <select id="source-filter">
+                <option value="all">ทุกแหล่ง</option>
+              </select>
+              <select id="owner-filter">
+                <option value="all">ทุกคน</option>
+                <option value="unassigned">ยังไม่แจก</option>
+              </select>
+            </div>
+
+            <div class="lead-table-wrap">
+              <table class="lead-table">
+                <thead>
+                  <tr>
+                    <th>ลูกค้า</th>
+                    <th>แหล่ง</th>
+                    <th>แผน</th>
+                    <th>สถานะ</th>
+                    <th>ผู้รับผิดชอบ</th>
+                    <th>จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="lead-table-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside class="panel detail-panel" aria-labelledby="detail-title">
+            <div class="panel-heading compact">
+              <div>
+                <h2 id="detail-title">รายละเอียด Lead</h2>
+                <p id="detail-subtitle">เลือก lead จากตาราง</p>
+              </div>
+            </div>
+            <div class="detail-content" id="lead-detail"></div>
+          </aside>
+        </section>
+
+        <section class="lower-grid">
+          <section class="panel" id="team" aria-labelledby="team-title">
+            <div class="panel-heading">
+              <div>
+                <h2 id="team-title">ลูกทีม</h2>
+                <p>เพิ่ม/ปิดใช้งานลูกทีม และดูจำนวน lead ที่ถืออยู่</p>
+              </div>
+            </div>
+            <form class="team-form" id="team-form">
+              <input id="member-name" name="memberName" type="text" placeholder="ชื่อลูกทีม" required />
+              <input id="member-contact" name="memberContact" type="text" placeholder="LINE / เบอร์โทร" />
+              <button class="secondary-btn" type="submit">เพิ่ม</button>
+            </form>
+            <div class="team-list" id="team-list"></div>
+          </section>
+
+          <section class="panel" aria-labelledby="manual-title">
+            <div class="panel-heading">
+              <div>
+                <h2 id="manual-title">เพิ่ม Lead เอง</h2>
+                <p>บันทึกเข้า Leads Central หรือ local mode ถ้ายังไม่เชื่อม Apps Script</p>
+              </div>
+            </div>
+            <form class="manual-form" id="manual-lead-form">
+              <input id="lead-name" name="leadName" type="text" placeholder="ชื่อลูกค้า" required />
+              <input id="lead-phone" name="leadPhone" type="tel" placeholder="เบอร์โทร" required />
+              <input id="lead-line" name="leadLine" type="text" placeholder="LINE ID" />
+              <select id="lead-interest" name="leadInterest">
+                <option value="ประกันสุขภาพ">ประกันสุขภาพ</option>
+                <option value="ประกันโรคร้ายแรง">ประกันโรคร้ายแรง</option>
+                <option value="Heritage Plus">Heritage Plus</option>
+                <option value="ปรึกษาแผนประกัน">ปรึกษาแผนประกัน</option>
+              </select>
+              <button class="secondary-btn" type="submit">เพิ่ม Lead</button>
+            </form>
+          </section>
+        </section>
+
+        <section class="panel source-panel" id="sources" aria-labelledby="source-title">
+          <div class="panel-heading">
+            <div>
+              <h2 id="source-title">แหล่ง Leads ที่ตั้งค่าไว้</h2>
+              <p>ข้อมูลนี้ตรงกับแท็บ `Source Config` ในชีตกลาง</p>
+            </div>
+          </div>
+          <div class="source-list">
+            <article><strong>Winner Prestige Leads</strong><span>ชีต1</span></article>
+            <article><strong>FWD Leads 162165</strong><span>ชีต1, Web Premium Leads</span></article>
+            <article><strong>Leads Line for Duan Only</strong><span>Leads Center, heritage Plus</span></article>
+            <article><strong>Health WebApp Leads V2 Database</strong><span>Health WebApp Leads V2</span></article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="admin.js"></script>
+  </body>
+</html>
