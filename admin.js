@@ -1,5 +1,6 @@
 const formatter = new Intl.NumberFormat("th-TH", { maximumFractionDigits: 0 });
 const centralApiStorageKey = "fwd-central-api-url";
+const defaultCentralApiUrl = "https://script.google.com/macros/s/AKfycbwtDcugQxU_7hqlwuaIGQq1nCsh_fo96fphUTP0HPIUx6MmdN2Sq6khyPg4Jhy_13Yrag/exec";
 const leadStorageKey = "fwd-admin-leads";
 const teamStorageKey = "fwd-admin-team";
 
@@ -27,7 +28,7 @@ const elements = {
   teamList: document.querySelector("#team-list"),
 };
 
-let centralApiUrl = window.localStorage.getItem(centralApiStorageKey) || "";
+let centralApiUrl = window.localStorage.getItem(centralApiStorageKey) || defaultCentralApiUrl;
 let selectedLeadId = "";
 let leads = loadState(leadStorageKey, [
   {
@@ -552,6 +553,10 @@ function clearFilters() {
 }
 
 function handleTableClick(event) {
+  if (event.target.closest("select")) {
+    return;
+  }
+
   const assignId = event.target.dataset.assign;
   if (assignId) {
     assignLead(assignId);
