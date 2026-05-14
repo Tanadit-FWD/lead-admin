@@ -1657,25 +1657,42 @@
       }
 
       function statusClassFromText(status = "") {
-        if (status.includes("เปิดรับ") || status.includes("กำลัง")) return "green";
-        if (status.includes("พัก")) return "yellow";
+        if (status.includes("เปิดรับ") || status.includes("กำลัง") || status === "Active") return "green";
+        if (status.includes("พัก") || status === "Paused") return "yellow";
         if (status.includes("รองาน") || status.includes("รอ")) return "blue";
         return "gray";
       }
 
+      function displayTeamStatus(status = "") {
+        if (status === "Active") return "เปิดรับ leads";
+        if (status === "Paused") return "พักงาน";
+        if (status === "Inactive") return "ปิดรับ";
+        return status || "เปิดรับ leads";
+      }
+
+      function parseContact(contact = "") {
+        const text = String(contact || "");
+        const phone = (text.match(/0\d[\d -]{7,}/) || text.match(/\d{8,}/) || [""])[0].replace(/\s+/g, "");
+        const line = text.replace(/^LINE:\s*/i, "").replace(/^โทร\s*/i, "").trim();
+        return { phone: phone || text || "-", line: line || "-" };
+      }
+
       function normalizeTeamMember(item, index = 0) {
         if (Array.isArray(item)) {
-          const status = item[3] || item[4] || "เปิดรับ leads";
-          return { name: item[0] || `ลูกทีม ${index + 1}`, phone: item[1] || "-", line: item[2] || "-", status, statusClass: statusClassFromText(status), leads: Number(item[5] || 0), contacted: Number(item[6] || 0), appointments: Number(item[7] || 0), closed: Number(item[8] || 0) };
+          const status = displayTeamStatus(item[4] || item[3] || "Active");
+          const contact = parseContact(item[2]);
+          return { memberId: item[0] || `tm-${index + 1}`, name: item[1] || `ลูกทีม ${index + 1}`, phone: contact.phone, line: contact.line, status, statusClass: statusClassFromText(status), leads: Number(item[5] || 0), contacted: 0, appointments: 0, closed: 0 };
         }
-        const status = item.status || item.Status || item["สถานะ"] || "เปิดรับ leads";
+        const status = displayTeamStatus(item.status || item.Status || item["สถานะ"] || "Active");
+        const contact = parseContact(item.contact || item.Contact || item["ติดต่อ"] || "");
         return {
+          memberId: item.memberId || item["Member ID"] || item.id || `tm-${index + 1}`,
           name: item.name || item.Name || item["ชื่อ-นามสกุล"] || item["ชื่อ"] || `ลูกทีม ${index + 1}`,
-          phone: item.phone || item.Phone || item["เบอร์โทร"] || "-",
-          line: item.line || item.lineId || item["LINE ID"] || item["Line ID"] || "-",
+          phone: item.phone || item.Phone || item["เบอร์โทร"] || contact.phone,
+          line: item.line || item.lineId || item["LINE ID"] || item["Line ID"] || contact.line,
           status,
           statusClass: statusClassFromText(status),
-          leads: Number(item.leads || item["Leads ที่ดูแล"] || item.assignedLeads || 0),
+          leads: Number(item.leads || item["Active Lead Count"] || item["Leads ที่ดูแล"] || item.assignedLeads || 0),
           contacted: Number(item.contacted || item["ติดต่อแล้ว"] || 0),
           appointments: Number(item.appointments || item["นัดหมาย"] || 0),
           closed: Number(item.closed || item["ปิดการขาย"] || 0)
@@ -1693,6 +1710,17 @@
         }
         await navigator.clipboard.writeText(text);
         showToast("คัดลอกข้อความแชร์แล้ว");
+      }
+
+      async function callScript(action, payload = {}) {
+        const url = (document.querySelector("#scriptWebAppUrl")?.value || localStorage.getItem("fwdGoogleScriptUrl") || "").trim();
+        if (!url) return { ok: false, localOnly: true, error: "ยังไม่ได้ตั้งค่า Google Script URL" };
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action, ...payload })
+        });
+        return response.json();
       }
 
       function downloadCsv(filename, rows) {
@@ -1713,7 +1741,7 @@
           <tr>
             <td>${index + 1}</td><td>${lead[0]}</td><td>${lead[1]}</td><td>${lead[2]}</td><td>${lead[3]}</td><td>${lead[4]}</td>
             <td><select class="select"><option>เลือกคนดูแล</option><option>ธนัทธ์ ศรีสุข</option><option>จิราภรณ์ แก้วมณี</option></select></td>
-            <td><div class="lead-actions"><button class="mini-btn submit" type="button">Submit</button><button class="mini-btn flex" type="button">ส่ง Flex</button></div></td>
+            <td><div class="lead-actions"><button class="mini-btn submit" type="button" data-lead-id="${lead[7] || ""}">Submit</button><button class="mini-btn flex" type="button">ส่ง Flex</button></div></td>
           </tr>`).join("");
 
         document.querySelector("#sourceLeadRows").innerHTML = sourceLeadSnapshot.map((lead, index) => {
@@ -1823,11 +1851,20 @@
           const owner = row?.querySelector("select")?.value || "";
           saveLocalState();
           showToast(`บันทึก ${name}${owner && !owner.includes("เลือก") ? ` ให้ ${owner}` : ""} แล้ว`);
+          callScript("assignLead", { leadId: submitButton.dataset.leadId, assignedTo: owner }).then((result) => {
+            if (result.localOnly) showToast("บันทึกในเครื่องแล้ว แต่ยังไม่ได้ต่อ Google Script จึงยังไม่เขียนกลับชีต");
+            else if (!result.ok) showToast(`เขียนกลับชีตไม่สำเร็จ: ${result.error || "unknown"}`);
+            else showToast("บันทึกกลับชีต Leads Central แล้ว");
+          }).catch(() => showToast("เขียนกลับชีตไม่สำเร็จ ตรวจ Google Script"));
         }
         if (flexButton) {
           flexButton.textContent = "ส่งแล้ว";
           const row = flexButton.closest("tr");
           const leadText = row ? `Lead: ${row.children[1]?.textContent}\nโทร: ${row.children[2]?.textContent}\nสนใจ: ${row.children[3]?.textContent}` : "FWD Lead";
+          callScript("sendLineFlex", { title: "FWD Lead", lines: leadText.split("\n"), to: localStorage.getItem("fwdLinePushTo") || "" }).then((result) => {
+            if (result.localOnly || !result.ok) showToast("ยังไม่ได้ตั้งค่า LINE token/to ใน Google Script จึงเปิด LINE share แทน");
+            else showToast("ส่ง LINE Flex จริงแล้ว");
+          }).catch(() => showToast("ส่ง LINE จริงไม่สำเร็จ เปิด LINE share แทน"));
           lineShare(leadText);
           showToast("เปิดหน้าส่ง LINE แล้ว");
         }
@@ -1858,7 +1895,12 @@
         }
         if (event.target.closest("#detailSendLine")) {
           const item = getDisplayHealthRows(healthLeads)[selectedHealthIndex];
-          lineShare(`ข้อมูลสุขภาพ FWD\nชื่อ: ${item?.name || "-"}\nโทร: ${item?.phone || "-"}\nโรคประจำตัว: ${item?.chronicDisease || "-"}\nประวัติรักษา: ${item?.treatment || "-"}`);
+          const lines = [`ชื่อ: ${item?.name || "-"}`, `โทร: ${item?.phone || "-"}`, `โรคประจำตัว: ${item?.chronicDisease || "-"}`, `ประวัติรักษา: ${item?.treatment || "-"}`];
+          callScript("sendLineFlex", { title: "ข้อมูลสุขภาพ FWD", lines, to: localStorage.getItem("fwdLinePushTo") || "" }).then((result) => {
+            if (result.localOnly || !result.ok) showToast("ยังไม่ได้ตั้งค่า LINE token/to ใน Google Script จึงเปิด LINE share แทน");
+            else showToast("ส่ง LINE Flex จริงแล้ว");
+          }).catch(() => showToast("ส่ง LINE จริงไม่สำเร็จ เปิด LINE share แทน"));
+          lineShare(`ข้อมูลสุขภาพ FWD\n${lines.join("\n")}`);
           showToast("เปิดหน้าส่ง LINE แล้ว");
         }
         if (event.target.closest("#detailPrintPdf")) {
@@ -1905,6 +1947,10 @@
           renderAgentCard();
           saveLocalState();
           showToast("อัปเดตสถานะลูกทีมแล้ว");
+          callScript("updateTeamStatus", { memberId: agent?.memberId, status }).then((result) => {
+            if (result.localOnly) showToast("ยังไม่ได้ต่อ Google Script จึงยังไม่เขียน Team Members");
+            else if (!result.ok) showToast(`เขียน Team Members ไม่สำเร็จ: ${result.error || "unknown"}`);
+          }).catch(() => showToast("เขียน Team Members ไม่สำเร็จ"));
           document.querySelector("#agentManagePanel").hidden = true;
         }
         if (newAgentSubmit) {
@@ -1917,6 +1963,7 @@
           const line = lineInput?.value.trim() || "-";
           const status = statusInput?.value || "เปิดรับ leads";
           teamMembers.push({
+            memberId: `local-${Date.now()}`,
             name,
             phone,
             line,
@@ -1935,6 +1982,11 @@
           renderRows();
           saveLocalState();
           showToast(`เพิ่มลูกทีม ${name} แล้ว`);
+          callScript("saveTeamMember", { member: { name, contact: line && line !== "-" ? `LINE: ${line}` : phone, phone, status } }).then((result) => {
+            if (result.localOnly) showToast("ยังไม่ได้ต่อ Google Script จึงยังไม่เพิ่มลง Team Members");
+            else if (!result.ok) showToast(`เพิ่มลง Team Members ไม่สำเร็จ: ${result.error || "unknown"}`);
+            else showToast("เพิ่มลง Team Members แล้ว");
+          }).catch(() => showToast("เพิ่มลง Team Members ไม่สำเร็จ"));
           document.querySelector("#agentCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
         if (deleteAgent) {
@@ -2555,7 +2607,8 @@
             item.source || item["Source File"] || "Google Script",
             item.createdAt || item["Created At"] || "-",
             item.status || item.Status || "New",
-            item.assignedTo || item["Assigned To"] || ""
+            item.assignedTo || item["Assigned To"] || "",
+            item.leadId || item["Lead ID"] || ""
           ]);
           const members = payload.teamMembers || payload.members || payload["Team Members"] || [];
           if (Array.isArray(members) && members.length) {
@@ -2563,7 +2616,7 @@
           }
           const healthRows = payload.health || payload.healthLeads || payload["Health WebApp Leads V2"] || [];
           if (Array.isArray(healthRows) && healthRows.length) {
-            healthLeads = healthRows.map((item) => Array.isArray(item) ? normalizeHealthRow(item, {}) : item);
+            healthLeads = healthRows.map((item, index) => mapHealthRow(item, index));
             renderHealthRows();
           }
           renderRows();
