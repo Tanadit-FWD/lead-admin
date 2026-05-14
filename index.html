@@ -1,185 +1,812 @@
 <!doctype html>
 <html lang="th">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FWD Lead Admin</title>
-    <link rel="stylesheet" href="admin.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>แผนประกัน FWD สำหรับลูกค้า VVIP อายุ 45 ปี</title>
+    <meta
+      name="description"
+      content="สรุปแผนประกัน FWD สำหรับลูกค้าชายอายุ 45 ปี เน้นทุนโรคร้ายแรง 1 ล้านบาท พร้อมตลอดชีพ 90/20 และค่าชดเชยรายวัน"
+    >
+    <style>
+      :root {
+        --ink: #10202b;
+        --muted: #5d6a73;
+        --navy: #11344d;
+        --teal: #087c85;
+        --mint: #d9f3ed;
+        --gold: #d69b24;
+        --rose: #d4575f;
+        --paper: #f7f8f5;
+        --white: #ffffff;
+        --line: #dde4df;
+        --shadow: 0 22px 70px rgba(16, 32, 43, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: var(--paper);
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        line-height: 1.65;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .page {
+        overflow: hidden;
+      }
+
+      .nav {
+        position: fixed;
+        top: 0;
+        z-index: 20;
+        width: 100%;
+        background: rgba(247, 248, 245, 0.88);
+        border-bottom: 1px solid rgba(221, 228, 223, 0.8);
+        backdrop-filter: blur(18px);
+      }
+
+      .nav__inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 14px 22px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        color: var(--navy);
+      }
+
+      .brand__mark {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        color: var(--white);
+        background: var(--teal);
+        border-radius: 8px;
+        font-size: 13px;
+      }
+
+      .nav__links {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        color: var(--muted);
+        font-size: 14px;
+        white-space: nowrap;
+      }
+
+      .nav__cta,
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 8px;
+        font-weight: 800;
+        color: var(--white);
+        background: var(--teal);
+        box-shadow: 0 12px 30px rgba(8, 124, 133, 0.22);
+      }
+
+      .hero {
+        min-height: 88vh;
+        padding-top: 72px;
+        background:
+          linear-gradient(90deg, rgba(16, 32, 43, 0.88) 0%, rgba(16, 32, 43, 0.66) 43%, rgba(16, 32, 43, 0.1) 78%),
+          url("assets/fwd-hero.png") center right / cover no-repeat;
+        color: var(--white);
+      }
+
+      .hero__inner {
+        display: grid;
+        align-items: center;
+        min-height: calc(88vh - 72px);
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 56px 22px 72px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        padding: 7px 11px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.11);
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 14px;
+      }
+
+      .eyebrow::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--gold);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 720px;
+        margin-bottom: 20px;
+        font-size: clamp(38px, 6.8vw, 78px);
+        line-height: 1.06;
+      }
+
+      .hero__lead {
+        max-width: 640px;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 20px;
+      }
+
+      .hero__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 34px;
+      }
+
+      .button--secondary {
+        color: var(--white);
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        box-shadow: none;
+      }
+
+      .hero__proof {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 150px));
+        gap: 14px;
+      }
+
+      .proof {
+        padding: 14px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .proof strong {
+        display: block;
+        font-size: 24px;
+        line-height: 1.2;
+      }
+
+      .proof span {
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 13px;
+      }
+
+      section {
+        padding: 84px 22px;
+      }
+
+      .section__inner {
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+
+      .section__head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 26px;
+        margin-bottom: 34px;
+      }
+
+      .section__head h2 {
+        max-width: 680px;
+        margin-bottom: 0;
+        color: var(--navy);
+        font-size: clamp(28px, 4.4vw, 48px);
+        line-height: 1.15;
+      }
+
+      .section__head p {
+        max-width: 410px;
+        margin-bottom: 0;
+        color: var(--muted);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .metric {
+        min-height: 150px;
+        padding: 24px;
+        background: var(--white);
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 8px;
+        color: var(--navy);
+        font-size: clamp(26px, 3.8vw, 42px);
+        line-height: 1.12;
+      }
+
+      .plan {
+        background: var(--white);
+      }
+
+      .plan__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+        gap: 34px;
+        align-items: start;
+      }
+
+      .table-wrap {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--white);
+      }
+
+      th,
+      td {
+        padding: 18px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--navy);
+        background: #edf6f4;
+        font-size: 14px;
+      }
+
+      td:last-child,
+      th:last-child {
+        text-align: right;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .total-row td {
+        color: var(--navy);
+        background: #fff8e8;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .quote-panel {
+        padding: 30px;
+        border-radius: 8px;
+        background: var(--navy);
+        color: var(--white);
+        box-shadow: var(--shadow);
+      }
+
+      .quote-panel h3 {
+        margin-bottom: 16px;
+        font-size: 28px;
+        line-height: 1.25;
+      }
+
+      .quote-panel p {
+        color: rgba(255, 255, 255, 0.76);
+      }
+
+      .quote-panel__price {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin: 26px 0;
+      }
+
+      .quote-panel__price strong {
+        color: var(--gold);
+        font-size: 42px;
+        line-height: 1;
+      }
+
+      .quote-panel__price span {
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .features {
+        background: #edf6f4;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .feature-card {
+        min-height: 260px;
+        padding: 24px;
+        border: 1px solid rgba(8, 124, 133, 0.16);
+        border-radius: 8px;
+        background: var(--white);
+      }
+
+      .feature-card__icon {
+        display: grid;
+        width: 46px;
+        height: 46px;
+        margin-bottom: 20px;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--white);
+        background: var(--teal);
+        font-size: 22px;
+        font-weight: 900;
+      }
+
+      .feature-card:nth-child(2) .feature-card__icon {
+        background: var(--gold);
+      }
+
+      .feature-card:nth-child(3) .feature-card__icon {
+        background: var(--rose);
+      }
+
+      .feature-card:nth-child(4) .feature-card__icon {
+        background: var(--navy);
+      }
+
+      .feature-card h3 {
+        margin-bottom: 10px;
+        color: var(--navy);
+        font-size: 21px;
+        line-height: 1.35;
+      }
+
+      .feature-card p {
+        margin-bottom: 0;
+        color: var(--muted);
+      }
+
+      .consider {
+        background: var(--white);
+      }
+
+      .consider__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+        gap: 36px;
+        align-items: center;
+      }
+
+      .notice {
+        padding: 30px;
+        border-left: 6px solid var(--gold);
+        border-radius: 8px;
+        background: #fff8e8;
+      }
+
+      .notice h2 {
+        color: var(--navy);
+        font-size: clamp(28px, 4vw, 42px);
+        line-height: 1.18;
+      }
+
+      .check-list {
+        display: grid;
+        gap: 14px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .check-list li {
+        display: grid;
+        grid-template-columns: 32px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+      }
+
+      .check-list span {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--white);
+        background: var(--teal);
+        font-weight: 900;
+      }
+
+      .cta {
+        color: var(--white);
+        background: var(--navy);
+      }
+
+      .cta__inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .cta h2 {
+        max-width: 760px;
+        margin-bottom: 12px;
+        font-size: clamp(30px, 4.8vw, 54px);
+        line-height: 1.12;
+      }
+
+      .cta p {
+        max-width: 720px;
+        margin-bottom: 0;
+        color: rgba(255, 255, 255, 0.74);
+      }
+
+      .fineprint {
+        padding: 28px 22px;
+        color: var(--muted);
+        background: #eef1ed;
+        font-size: 13px;
+      }
+
+      .fineprint__inner {
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 900px) {
+        .nav__links {
+          display: none;
+        }
+
+        .hero {
+          min-height: auto;
+          background:
+            linear-gradient(180deg, rgba(16, 32, 43, 0.92) 0%, rgba(16, 32, 43, 0.72) 58%, rgba(16, 32, 43, 0.28) 100%),
+            url("assets/fwd-hero.png") center / cover no-repeat;
+        }
+
+        .hero__inner {
+          min-height: 760px;
+          align-items: start;
+          padding-top: 84px;
+        }
+
+        .hero__proof,
+        .metrics,
+        .feature-grid,
+        .plan__grid,
+        .consider__grid,
+        .cta__inner {
+          grid-template-columns: 1fr;
+        }
+
+        .section__head {
+          display: block;
+        }
+
+        .section__head p {
+          margin-top: 12px;
+        }
+
+        td:last-child,
+        th:last-child {
+          text-align: left;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .nav__inner {
+          padding-inline: 16px;
+        }
+
+        .nav__cta {
+          min-height: 40px;
+          padding-inline: 12px;
+          font-size: 13px;
+        }
+
+        .hero__inner,
+        section {
+          padding-inline: 16px;
+        }
+
+        .hero__inner {
+          min-height: 720px;
+        }
+
+        h1 {
+          font-size: 38px;
+        }
+
+        .hero__lead {
+          font-size: 17px;
+        }
+
+        .hero__actions .button {
+          width: 100%;
+        }
+
+        th,
+        td {
+          padding: 14px;
+          font-size: 14px;
+        }
+
+        .quote-panel,
+        .notice {
+          padding: 22px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div class="admin-shell">
-      <aside class="admin-sidebar" aria-label="เมนูแอดมิน">
-        <a class="admin-brand" href="index.html">
-          <span>FWD</span>
-          <small>Lead Admin</small>
-        </a>
-        <nav>
-          <a href="#overview">ภาพรวม</a>
-          <a href="#leads">Leads กลาง</a>
-          <a href="#team">ลูกทีม</a>
-          <a href="#sources">แหล่งข้อมูล</a>
-        </nav>
-        <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1LzNAXK27a87ydnKd-WY3lDL8Pool29RR8zxAEy2vaPQ/edit" target="_blank" rel="noreferrer">เปิดชีตกลาง</a>
-      </aside>
+    <main class="page">
+      <nav class="nav" aria-label="หลัก">
+        <div class="nav__inner">
+          <a class="brand" href="#top" aria-label="กลับไปด้านบน">
+            <span class="brand__mark">FWD</span>
+            <span>VVIP Protection Plan</span>
+          </a>
+          <div class="nav__links">
+            <a href="#summary">ภาพรวม</a>
+            <a href="#plan">รายละเอียดแผน</a>
+            <a href="#highlights">จุดเด่น</a>
+            <a href="#consider">ข้อพิจารณา</a>
+          </div>
+          <a class="nav__cta" href="#contact">นัดคุยแผน</a>
+        </div>
+      </nav>
 
-      <main class="admin-main">
-        <header class="admin-top" id="overview">
+      <header class="hero" id="top">
+        <div class="hero__inner">
           <div>
-            <span class="eyebrow">Central Lead Distribution</span>
-            <h1>หน้าแอดมินแจกจ่าย Leads</h1>
-            <p>รวม lead จากหลายชีตไว้ที่เดียว กรองตามสถานะ/แหล่งที่มา แล้วแจกให้ลูกทีมได้ทันที</p>
-          </div>
-          <div class="admin-actions">
-            <a class="ghost-btn" href="index.html">กลับหน้าเว็บ</a>
-            <button class="primary-btn" id="sync-sources" type="button">Sync 4 ชีต</button>
-          </div>
-        </header>
-
-        <section class="connect-panel" aria-labelledby="connect-title">
-          <div>
-            <h2 id="connect-title">เชื่อม Apps Script</h2>
-            <p>วาง Web App URL หลัง deploy `apps-script/Code.gs` แล้วระบบจะอ่าน/เขียนข้อมูลจาก Google Sheet กลาง</p>
-          </div>
-          <div class="connect-form">
-            <input id="central-api-url" type="url" placeholder="Apps Script Web App URL" />
-            <button class="secondary-btn" id="save-api-url" type="button">บันทึก</button>
-            <button class="ghost-btn" id="refresh-central" type="button">Refresh</button>
-            <span class="sync-status" id="sync-status">Local mode</span>
-          </div>
-        </section>
-
-        <section class="metric-grid" aria-label="สรุป leads">
-          <article>
-            <span>Leads ทั้งหมด</span>
-            <strong id="metric-total">0</strong>
-          </article>
-          <article>
-            <span>รอแจก</span>
-            <strong id="metric-new">0</strong>
-          </article>
-          <article>
-            <span>แจกแล้ว</span>
-            <strong id="metric-assigned">0</strong>
-          </article>
-          <article>
-            <span>ลูกทีม active</span>
-            <strong id="metric-team">0</strong>
-          </article>
-        </section>
-
-        <section class="workspace-grid">
-          <section class="panel lead-workspace" id="leads" aria-labelledby="lead-title">
-            <div class="panel-heading">
-              <div>
-                <h2 id="lead-title">Leads กลาง</h2>
-                <p id="lead-summary">เลือก lead เพื่อดูรายละเอียด หรือแจกงานให้ลูกทีม</p>
+            <div class="eyebrow">ลูกค้า VVIP ชาย อายุ 45 ปี</div>
+            <h1>คุ้มครองโรคร้ายแรง 1 ล้านบาท พร้อมแผนตลอดชีพที่จ่ายเบี้ย 20 ปี</h1>
+            <p class="hero__lead">
+              แผนประกัน FWD ที่วางน้ำหนักกับความเสี่ยงใหญ่ของวัยทำงาน: โรคร้ายแรง รายได้ระหว่างพักรักษาตัว และความคุ้มครองชีวิตระยะยาว
+            </p>
+            <div class="hero__actions">
+              <a class="button" href="#plan">ดูรายละเอียดเบี้ย</a>
+              <a class="button button--secondary" href="#highlights">ดูจุดเด่น</a>
+            </div>
+            <div class="hero__proof" aria-label="ตัวเลขสำคัญ">
+              <div class="proof">
+                <strong>1 ล้านบาท</strong>
+                <span>ทุนโรคร้ายแรง CI50</span>
               </div>
-              <button class="ghost-btn" id="clear-filters" type="button">ล้างตัวกรอง</button>
+              <div class="proof">
+                <strong>16,030</strong>
+                <span>บาทต่อปี รวมเบี้ย</span>
+              </div>
+              <div class="proof">
+                <strong>90/20</strong>
+                <span>คุ้มครองยาว จ่าย 20 ปี</span>
+              </div>
             </div>
+          </div>
+        </div>
+      </header>
 
-            <div class="filters">
-              <input id="search-input" type="search" placeholder="ค้นหา ชื่อ / เบอร์ / LINE / แผน" />
-              <select id="status-filter">
-                <option value="all">ทุกสถานะ</option>
-                <option value="New">New</option>
-                <option value="Assigned">Assigned</option>
-                <option value="Contacted">Contacted</option>
-                <option value="Follow Up">Follow Up</option>
-                <option value="Closed">Closed</option>
-                <option value="Duplicate">Duplicate</option>
-              </select>
-              <select id="source-filter">
-                <option value="all">ทุกแหล่ง</option>
-              </select>
-              <select id="owner-filter">
-                <option value="all">ทุกคน</option>
-                <option value="unassigned">ยังไม่แจก</option>
-              </select>
+      <section id="summary">
+        <div class="section__inner">
+          <div class="section__head">
+            <h2>ภาพรวมแผนที่เน้นปิดความเสี่ยงก้อนใหญ่ในงบประมาณรายเดือนที่จับต้องได้</h2>
+            <p>เหมาะกับผู้ที่ต้องการเสริมความมั่นคงทางการเงินเมื่อเกิดโรคร้ายแรง และยังต้องการความคุ้มครองชีวิตระยะยาวให้ครอบครัว</p>
+          </div>
+          <div class="metrics">
+            <div class="metric">
+              <span>เบี้ยเฉลี่ยต่อเดือน</span>
+              <strong>1,336 บาท</strong>
             </div>
+            <div class="metric">
+              <span>ทุนชีวิตตลอดชีพ</span>
+              <strong>200,000 บาท</strong>
+            </div>
+            <div class="metric">
+              <span>ชดเชยรายวัน</span>
+              <strong>1,000 บาท</strong>
+            </div>
+            <div class="metric">
+              <span>จำนวนโรคร้ายแรง</span>
+              <strong>50 โรค</strong>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div class="lead-table-wrap">
-              <table class="lead-table">
+      <section class="plan" id="plan">
+        <div class="section__inner plan__grid">
+          <div>
+            <div class="section__head">
+              <h2>รายละเอียดแผนหลักและสัญญาเพิ่มเติม</h2>
+            </div>
+            <div class="table-wrap">
+              <table>
                 <thead>
                   <tr>
-                    <th>ลูกค้า</th>
-                    <th>แหล่ง</th>
-                    <th>แผน</th>
-                    <th>สถานะ</th>
-                    <th>ผู้รับผิดชอบ</th>
-                    <th>จัดการ</th>
+                    <th>รายการ</th>
+                    <th>ทุน</th>
+                    <th>เบี้ยปี</th>
                   </tr>
                 </thead>
-                <tbody id="lead-table-body"></tbody>
+                <tbody>
+                  <tr>
+                    <td>ตลอดชีพ 90/20</td>
+                    <td>200,000 บาท</td>
+                    <td>6,940 บาท</td>
+                  </tr>
+                  <tr>
+                    <td>รักษาพยาบาลรายวัน HSB</td>
+                    <td>1,000 บาท/วัน</td>
+                    <td>1,600 บาท</td>
+                  </tr>
+                  <tr>
+                    <td>โรคร้ายแรง CI50</td>
+                    <td>1,000,000 บาท</td>
+                    <td>7,490 บาท</td>
+                  </tr>
+                  <tr>
+                    <td>ยกเว้นเบี้ย PWB</td>
+                    <td>ตามเงื่อนไขสัญญา</td>
+                    <td>ฟรี</td>
+                  </tr>
+                  <tr class="total-row">
+                    <td>รวมเบี้ยทั้งหมด</td>
+                    <td></td>
+                    <td>16,030 บาท</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
-          </section>
+          </div>
 
-          <aside class="panel detail-panel" aria-labelledby="detail-title">
-            <div class="panel-heading compact">
-              <div>
-                <h2 id="detail-title">รายละเอียด Lead</h2>
-                <p id="detail-subtitle">เลือก lead จากตาราง</p>
-              </div>
+          <aside class="quote-panel" aria-label="สรุปราคา">
+            <h3>จุดคุ้มค่าหลักอยู่ที่ทุน CI50 สูงเมื่อเทียบกับเบี้ยรายปี</h3>
+            <p>
+              สำหรับอายุ 45 ปี เบี้ยโรคร้ายแรง 7,490 บาทต่อปี หรือประมาณ 625 บาทต่อเดือน ช่วยเตรียมเงินก้อนเมื่อต้องเจอค่าใช้จ่ายและรายได้ที่สะดุดจากโรคร้ายแรง
+            </p>
+            <div class="quote-panel__price">
+              <strong>625</strong>
+              <span>บาท/เดือน สำหรับ CI50</span>
             </div>
-            <div class="detail-content" id="lead-detail"></div>
+            <a class="button" href="#contact">ขอเช็กความเหมาะสม</a>
           </aside>
-        </section>
+        </div>
+      </section>
 
-        <section class="lower-grid">
-          <section class="panel" id="team" aria-labelledby="team-title">
-            <div class="panel-heading">
-              <div>
-                <h2 id="team-title">ลูกทีม</h2>
-                <p>เพิ่ม/ปิดใช้งานลูกทีม และดูจำนวน lead ที่ถืออยู่</p>
-              </div>
-            </div>
-            <form class="team-form" id="team-form">
-              <input id="member-name" name="memberName" type="text" placeholder="ชื่อลูกทีม" required />
-              <input id="member-contact" name="memberContact" type="text" placeholder="LINE / เบอร์โทร" />
-              <button class="secondary-btn" type="submit">เพิ่ม</button>
-            </form>
-            <div class="team-list" id="team-list"></div>
-          </section>
-
-          <section class="panel" aria-labelledby="manual-title">
-            <div class="panel-heading">
-              <div>
-                <h2 id="manual-title">เพิ่ม Lead เอง</h2>
-                <p>บันทึกเข้า Leads Central หรือ local mode ถ้ายังไม่เชื่อม Apps Script</p>
-              </div>
-            </div>
-            <form class="manual-form" id="manual-lead-form">
-              <input id="lead-name" name="leadName" type="text" placeholder="ชื่อลูกค้า" required />
-              <input id="lead-phone" name="leadPhone" type="tel" placeholder="เบอร์โทร" required />
-              <input id="lead-line" name="leadLine" type="text" placeholder="LINE ID" />
-              <select id="lead-interest" name="leadInterest">
-                <option value="ประกันสุขภาพ">ประกันสุขภาพ</option>
-                <option value="ประกันโรคร้ายแรง">ประกันโรคร้ายแรง</option>
-                <option value="Heritage Plus">Heritage Plus</option>
-                <option value="ปรึกษาแผนประกัน">ปรึกษาแผนประกัน</option>
-              </select>
-              <button class="secondary-btn" type="submit">เพิ่ม Lead</button>
-            </form>
-          </section>
-        </section>
-
-        <section class="panel source-panel" id="sources" aria-labelledby="source-title">
-          <div class="panel-heading">
-            <div>
-              <h2 id="source-title">แหล่ง Leads ที่ตั้งค่าไว้</h2>
-              <p>ข้อมูลนี้ตรงกับแท็บ `Source Config` ในชีตกลาง</p>
-            </div>
+      <section class="features" id="highlights">
+        <div class="section__inner">
+          <div class="section__head">
+            <h2>จุดเด่นที่ทำให้แผนนี้น่าสนใจ</h2>
+            <p>โครงสร้างแผนเหมาะกับการกันเงินก้อนสำหรับเหตุการณ์ที่กระทบชีวิตและกระแสเงินสดสูง</p>
           </div>
-          <div class="source-list">
-            <article><strong>Winner Prestige Leads</strong><span>ชีต1</span></article>
-            <article><strong>FWD Leads 162165</strong><span>ชีต1, Web Premium Leads</span></article>
-            <article><strong>Leads Line for Duan Only</strong><span>Leads Center, heritage Plus</span></article>
-            <article><strong>Health WebApp Leads V2 Database</strong><span>Health WebApp Leads V2</span></article>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <div class="feature-card__icon">1</div>
+              <h3>ทุนโรคร้ายแรง 1 ล้านบาท</h3>
+              <p>คุ้มครอง 50 โรคร้ายแรง เช่น มะเร็ง หัวใจ และเส้นเลือดสมอง ในเบี้ยที่ยังถือว่าบริหารงบได้สำหรับวัย 45 ปี</p>
+            </article>
+            <article class="feature-card">
+              <div class="feature-card__icon">2</div>
+              <h3>มีค่าชดเชยรายวัน</h3>
+              <p>รับ 1,000 บาทต่อวันเมื่อนอนโรงพยาบาล ช่วยเสริมสภาพคล่องในช่วงพักรักษาตัวหรือขาดรายได้</p>
+            </article>
+            <article class="feature-card">
+              <div class="feature-card__icon">3</div>
+              <h3>PWB ช่วยพยุงแผน</h3>
+              <p>กรณีเข้าเงื่อนไขทุพพลภาพ ไม่ต้องรับภาระเบี้ยต่อ แต่ยังคงความคุ้มครองตามสัญญา</p>
+            </article>
+            <article class="feature-card">
+              <div class="feature-card__icon">4</div>
+              <h3>คุ้มครองยาวถึงอายุ 90</h3>
+              <p>แบบตลอดชีพ 90/20 จ่ายเบี้ย 20 ปี และยังมีทุนชีวิต 200,000 บาทสำหรับครอบครัว</p>
+            </article>
           </div>
-        </section>
-      </main>
-    </div>
+        </div>
+      </section>
 
-    <script src="admin.js"></script>
+      <section class="consider" id="consider">
+        <div class="section__inner consider__grid">
+          <div class="notice">
+            <h2>สิ่งที่ควรเช็กก่อนตัดสินใจ</h2>
+            <p>
+              แผนนี้เด่นเรื่องโรคร้ายแรงและเงินชดเชยรายวัน แต่ยังไม่ใช่ประกันสุขภาพเหมาจ่ายที่ครอบคลุมค่ารักษา IPD/OPD แบบเต็มระบบ
+            </p>
+          </div>
+          <ul class="check-list">
+            <li>
+              <span>✓</span>
+              <div>
+                <strong>ถ้ายังไม่มีสุขภาพเหมาจ่าย ควรพิจารณาเพิ่ม</strong><br>
+                เพื่อปิดความเสี่ยงค่าห้อง ค่าผ่าตัด ค่าแพทย์ และค่ารักษาจริงที่อาจสูงกว่าเงินชดเชยรายวัน
+              </div>
+            </li>
+            <li>
+              <span>✓</span>
+              <div>
+                <strong>ตรวจเงื่อนไขโรคร้ายแรงและระยะเวลารอคอย</strong><br>
+                รายละเอียดการจ่ายผลประโยชน์ขึ้นกับคำจำกัดความของโรคและเงื่อนไขในกรมธรรม์
+              </div>
+            </li>
+            <li>
+              <span>✓</span>
+              <div>
+                <strong>เทียบกับภาระครอบครัวและรายได้ปัจจุบัน</strong><br>
+                เบี้ยรวม 16,030 บาทต่อปี เหมาะเมื่ออยู่ในระดับที่จ่ายต่อเนื่องได้สบายตลอดอายุสัญญา
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="cta" id="contact">
+        <div class="section__inner cta__inner">
+          <div>
+            <h2>แผนนี้เหมาะเป็นฐานคุ้มครองโรคร้ายแรงสำหรับวัยทำงานที่ต้องการเงินก้อนสำรอง</h2>
+            <p>
+              ขั้นต่อไปควรเช็กสุขภาพเดิม งบประมาณต่อปี ประกันที่มีอยู่แล้ว และความต้องการเพิ่มแผนสุขภาพเหมาจ่าย เพื่อให้แผนครบขึ้นตามความเสี่ยงจริง
+            </p>
+          </div>
+          <a class="button" href="#plan">ทบทวนรายละเอียดแผน</a>
+        </div>
+      </section>
+
+      <footer class="fineprint">
+        <div class="fineprint__inner">
+          ข้อมูลนี้จัดทำเพื่อสรุปและนำเสนอแผนตามรายละเอียดที่ได้รับ ไม่ใช่เอกสารเสนอขายอย่างเป็นทางการ เงื่อนไข ความคุ้มครอง ข้อยกเว้น และการรับประกันภัยเป็นไปตามกรมธรรม์และหลักเกณฑ์ของบริษัทประกัน
+        </div>
+      </footer>
+    </main>
   </body>
 </html>

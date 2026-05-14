@@ -1,0 +1,2437 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FWD Lead Admin</title>
+    <style>
+      :root {
+        --bg: #07090a;
+        --panel: #111416;
+        --panel-2: #171a1d;
+        --line: #2b3035;
+        --line-orange: rgba(255, 101, 0, 0.7);
+        --text: #f7f7f5;
+        --muted: #a6adb4;
+        --soft: #707881;
+        --orange: #ff6500;
+        --orange-2: #ff8a22;
+        --green: #5abf2a;
+        --blue: #2f7df6;
+        --yellow: #f4c20d;
+        --purple: #9254de;
+        --red: #ef4444;
+        --shadow: 0 18px 70px rgba(0, 0, 0, 0.4);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 72% 12%, rgba(255, 101, 0, 0.08), transparent 32%),
+          radial-gradient(circle at 28% 80%, rgba(47, 125, 246, 0.05), transparent 28%),
+          var(--bg);
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        line-height: 1.45;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app {
+        display: grid;
+        min-height: 100vh;
+        grid-template-columns: 260px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 22px 14px;
+        border-right: 1px solid var(--line-orange);
+        background: linear-gradient(180deg, rgba(15, 18, 20, 0.98), rgba(6, 8, 9, 0.98));
+      }
+
+      .logo {
+        padding: 0 10px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .logo strong {
+        display: block;
+        color: var(--orange);
+        font-size: 44px;
+        line-height: 1;
+        letter-spacing: 0;
+      }
+
+      .logo span {
+        display: block;
+        margin-top: 4px;
+        font-weight: 700;
+      }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .nav button {
+        display: grid;
+        grid-template-columns: 26px 1fr auto;
+        gap: 9px;
+        align-items: center;
+        width: 100%;
+        min-height: 46px;
+        padding: 0 12px;
+        color: var(--text);
+        background: transparent;
+        border: 0;
+        border-radius: 8px;
+        text-align: left;
+      }
+
+      .nav button[aria-selected="true"] {
+        background: linear-gradient(135deg, var(--orange), #ff7d13);
+        box-shadow: 0 12px 30px rgba(255, 101, 0, 0.24);
+      }
+
+      .nav small {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--orange);
+      }
+
+      .today-card {
+        position: absolute;
+        right: 14px;
+        bottom: 22px;
+        left: 14px;
+        padding: 18px;
+        border: 1px solid var(--line-orange);
+        border-radius: 8px;
+        background: linear-gradient(145deg, rgba(23, 26, 29, 0.95), rgba(9, 11, 12, 0.95));
+      }
+
+      .today-card h3 {
+        margin: 0 0 16px;
+        font-size: 16px;
+      }
+
+      .today-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        margin: 11px 0;
+        color: var(--muted);
+      }
+
+      .today-row strong {
+        color: var(--orange);
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      .main {
+        min-width: 0;
+        padding: 22px 28px 34px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      .title h1 {
+        margin: 0;
+        font-size: clamp(28px, 4vw, 42px);
+        line-height: 1.12;
+      }
+
+      .title p {
+        margin: 3px 0 0;
+        color: var(--muted);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .btn {
+        min-height: 44px;
+        padding: 0 16px;
+        color: var(--text);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-weight: 700;
+      }
+
+      .btn.primary {
+        border-color: var(--orange);
+        background: linear-gradient(135deg, var(--orange), #ff7a00);
+      }
+
+      .btn.green {
+        border-color: #56c626;
+        background: linear-gradient(135deg, #4aad22, #69d336);
+      }
+
+      .script-sync-panel {
+        display: none;
+        margin: -4px 0 18px;
+        padding: 18px;
+        border: 1px solid rgba(255, 101, 0, 0.5);
+      }
+
+      .script-sync-panel.active {
+        display: block;
+      }
+
+      .script-sync-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .script-sync-panel h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+      }
+
+      .script-sync-panel p {
+        margin: 0 0 14px;
+        color: var(--muted);
+      }
+
+      .script-sync-panel input {
+        width: 100%;
+        min-height: 44px;
+        padding: 0 14px;
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.25);
+      }
+
+      .sync-status {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+
+      .stat-card,
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+          var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .stat-card {
+        display: grid;
+        grid-template-columns: 1fr 54px;
+        min-height: 132px;
+        padding: 18px 20px;
+        border-color: rgba(255, 101, 0, 0.42);
+      }
+
+      .stat-card span {
+        color: var(--muted);
+      }
+
+      .stat-card strong {
+        display: block;
+        margin: 6px 0 2px;
+        font-size: 40px;
+        line-height: 1;
+      }
+
+      .health-stat-card {
+        min-height: 98px;
+        padding: 12px 14px;
+        display: block;
+      }
+
+      .health-stat-card .bar-row {
+        grid-template-columns: minmax(64px, 0.85fr) 24px minmax(70px, 1.2fr) 36px;
+        margin: 5px 0;
+        gap: 7px;
+        font-size: 11px;
+      }
+
+      .health-stat-card .track {
+        height: 7px;
+      }
+
+      .health-stat-card h3 {
+        margin: 0 0 6px;
+        font-size: 13px;
+      }
+
+      .health-stat-card strong {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      .stat-icon {
+        display: grid;
+        width: 54px;
+        height: 54px;
+        place-items: center;
+        align-self: center;
+        border-radius: 999px;
+        color: var(--orange);
+        background: rgba(255, 101, 0, 0.14);
+        font-size: 26px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(330px, 0.96fr);
+        gap: 14px;
+      }
+
+      .panel {
+        overflow: hidden;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        min-height: 58px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .panel-head h2,
+      .panel-head h3 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .panel-head small {
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        padding: 10px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      th {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+        font-size: 13px;
+      }
+
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 78px;
+        min-height: 25px;
+        padding: 0 10px;
+        border-radius: 999px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .tag.green {
+        background: var(--green);
+      }
+
+      .tag.blue {
+        background: var(--blue);
+      }
+
+      .tag.yellow {
+        color: #1b1600;
+        background: var(--yellow);
+      }
+
+      .tag.purple {
+        background: var(--purple);
+      }
+
+      .tag.gray {
+        background: #606970;
+      }
+
+      .mini-btn {
+        min-height: 28px;
+        padding: 0 9px;
+        color: #8ce46b;
+        background: rgba(77, 191, 37, 0.1);
+        border: 1px solid rgba(90, 191, 42, 0.6);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .mini-btn.view-big {
+        min-height: 40px;
+        min-width: 76px;
+        padding: 0 16px;
+        color: var(--text);
+        border-color: rgba(255, 101, 0, 0.8);
+        background: linear-gradient(135deg, var(--orange), #ff7a00);
+        font-size: 14px;
+      }
+
+      .mini-btn.submit {
+        color: var(--text);
+        border-color: rgba(255, 101, 0, 0.75);
+        background: linear-gradient(135deg, rgba(255, 101, 0, 0.95), rgba(255, 125, 19, 0.86));
+      }
+
+      .mini-btn.flex {
+        display: none;
+      }
+
+      .lead-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .lead-actions.saved .mini-btn.flex {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .lead-actions.saved .mini-btn.submit {
+        color: var(--green);
+        border-color: rgba(90, 191, 42, 0.8);
+        background: rgba(77, 191, 37, 0.1);
+      }
+
+      .select {
+        min-height: 32px;
+        min-width: 130px;
+        padding: 0 10px;
+        color: var(--text);
+        background: #111416;
+        border: 1px solid #3a4047;
+        border-radius: 8px;
+      }
+
+      .chart-panel {
+        padding: 22px 18px;
+      }
+
+      .donut-wrap {
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .donut {
+        position: relative;
+        width: 190px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: conic-gradient(var(--orange) 0 42%, var(--blue) 42% 67%, var(--green) 67% 88%, var(--purple) 88% 100%);
+      }
+
+      .donut::after {
+        position: absolute;
+        inset: 54px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        content: "รวม\a 24\a Leads";
+        white-space: pre;
+        text-align: center;
+        font-weight: 900;
+        background: #111416;
+      }
+
+      .legend {
+        display: grid;
+        gap: 13px;
+      }
+
+      .legend-row {
+        display: grid;
+        grid-template-columns: 12px 1fr auto;
+        gap: 10px;
+        align-items: center;
+        color: var(--muted);
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+      }
+
+      .bars {
+        display: grid;
+        gap: 18px;
+        padding: 20px 18px;
+      }
+
+      .bar-row {
+        display: grid;
+        grid-template-columns: 105px 34px minmax(120px, 1fr) 58px;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .track {
+        height: 18px;
+        border: 1px solid #3c4248;
+        background: #0b0d0e;
+      }
+
+      .fill {
+        height: 100%;
+        background: var(--blue);
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: minmax(230px, 1fr) repeat(3, minmax(140px, 180px));
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .toolbar input,
+      .toolbar select,
+      textarea {
+        width: 100%;
+        min-height: 42px;
+        padding: 0 13px;
+        color: var(--text);
+        background: #0d0f10;
+        border: 1px solid #333940;
+        border-radius: 8px;
+      }
+
+      textarea {
+        min-height: 96px;
+        padding: 12px;
+        resize: vertical;
+      }
+
+      .health-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 410px;
+        gap: 14px;
+      }
+
+      .drawer {
+        padding: 18px;
+      }
+
+      .detail-page {
+        max-width: 1280px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--orange);
+        background: transparent;
+        border: 0;
+        font-weight: 800;
+      }
+
+      .case-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        color: var(--muted);
+      }
+
+      .case-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 0 10px;
+        color: #211600;
+        background: var(--yellow);
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .detail-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .profile-summary {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr) 1px minmax(220px, 0.8fr);
+        gap: 22px;
+        align-items: center;
+        padding: 26px;
+        border-color: var(--line-orange);
+      }
+
+      .avatar.big {
+        width: 86px;
+        height: 86px;
+        font-size: 42px;
+      }
+
+      .profile-name {
+        margin: 0 0 6px;
+        font-size: 24px;
+      }
+
+      .profile-contact {
+        display: grid;
+        gap: 5px;
+        color: var(--muted);
+      }
+
+      .divider {
+        width: 1px;
+        height: 88px;
+        background: var(--line);
+      }
+
+      .copy-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 16px;
+        color: var(--text);
+      }
+
+      .info-section {
+        margin-top: 14px;
+        padding: 18px;
+      }
+
+      .info-section h2 {
+        margin: 0 0 16px;
+        color: var(--orange);
+        font-size: 20px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0 22px;
+      }
+
+      .info-item {
+        min-height: 58px;
+        padding: 8px 0 12px;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.13);
+      }
+
+      .info-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .info-item strong {
+        display: block;
+        margin-top: 3px;
+        font-weight: 500;
+      }
+
+      .case-side {
+        display: grid;
+        gap: 14px;
+      }
+
+      .side-form {
+        padding: 18px;
+        border-color: var(--line-orange);
+      }
+
+      .side-form label {
+        display: block;
+        margin: 0 0 7px;
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .side-form input,
+      .side-form select {
+        width: 100%;
+        min-height: 42px;
+        padding: 0 12px;
+        color: var(--text);
+        background: #0d0f10;
+        border: 1px solid #333940;
+        border-radius: 8px;
+      }
+
+      .timeline {
+        padding: 18px;
+      }
+
+      .timeline h3 {
+        margin: 0 0 18px;
+      }
+
+      .side-list-title {
+        margin: 18px 0 4px;
+        font-size: 16px;
+      }
+
+      .side-list-total {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .timeline-item {
+        position: relative;
+        padding-left: 20px;
+        margin: 0 0 18px;
+        color: var(--muted);
+      }
+
+      .timeline-item::before {
+        position: absolute;
+        top: 7px;
+        left: 0;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        content: "";
+        background: var(--soft);
+      }
+
+      .timeline-item time {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--muted);
+      }
+
+      .timeline-item strong {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .customer-result-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .customer-result {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 160ms ease, background 160ms ease;
+      }
+
+      .customer-result:hover,
+      .customer-result:focus-visible,
+      .customer-result.active {
+        border-color: rgba(255, 101, 0, 0.65);
+        background: rgba(255, 101, 0, 0.28);
+        outline: none;
+      }
+
+      .customer-result strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .customer-result span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .detail-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+      }
+
+      .person {
+        display: grid;
+        grid-template-columns: 58px 1fr;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .avatar {
+        display: grid;
+        width: 58px;
+        height: 58px;
+        place-items: center;
+        border-radius: 50%;
+        color: var(--orange);
+        background: rgba(255, 101, 0, 0.14);
+        font-size: 26px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 22px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 14px;
+      }
+
+      .tabs button {
+        padding: 0 0 12px;
+        color: var(--muted);
+        background: transparent;
+        border: 0;
+      }
+
+      .tabs button.active {
+        color: var(--orange);
+        border-bottom: 2px solid var(--orange);
+      }
+
+      .qa-list {
+        display: grid;
+        gap: 10px;
+        margin: 0 0 22px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .qa-list li {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        color: var(--muted);
+      }
+
+      .qa-list strong {
+        color: var(--text);
+      }
+
+      .agent-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(380px, 0.75fr);
+        gap: 14px;
+      }
+
+      .agent-card {
+        padding: 22px;
+      }
+
+      .add-agent-panel {
+        margin-bottom: 14px;
+        padding: 18px;
+        border-color: var(--line-orange);
+      }
+
+      .add-agent-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .add-agent-grid input,
+      .add-agent-grid select {
+        width: 100%;
+        min-height: 42px;
+        padding: 0 12px;
+        color: var(--text);
+        background: #0d0f10;
+        border: 1px solid #333940;
+        border-radius: 8px;
+      }
+
+      .agent-lead-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .agent-lead-item {
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .agent-lead-item strong,
+      .agent-lead-item span {
+        display: block;
+      }
+
+      .agent-lead-item span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .agent-manage-panel {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 20;
+        width: min(360px, calc(100vw - 32px));
+        padding: 18px;
+        border: 1px solid var(--line-orange);
+        border-radius: 10px;
+        background: #111516;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      }
+
+      .agent-manage-panel select {
+        width: 100%;
+        min-height: 42px;
+        margin: 12px 0;
+        color: var(--text);
+        background: #0d0f10;
+        border: 1px solid #333940;
+        border-radius: 8px;
+      }
+
+      .agent-actions {
+        display: flex;
+        gap: 6px;
+      }
+
+      .agent-actions .mini-btn {
+        min-width: 38px;
+      }
+
+      .danger-btn {
+        width: 100%;
+        margin-top: 14px;
+        color: #ffded8;
+        border-color: rgba(255, 69, 58, 0.45);
+        background: rgba(255, 69, 58, 0.12);
+      }
+
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin: 18px 0;
+      }
+
+      .small-kpi {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .small-kpi strong {
+        display: block;
+        margin-top: 4px;
+        font-size: 26px;
+      }
+
+      .line-chart {
+        height: 230px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(to top, transparent 24%, rgba(255, 255, 255, 0.08) 25%, transparent 26%),
+          linear-gradient(to top, transparent 49%, rgba(255, 255, 255, 0.08) 50%, transparent 51%),
+          linear-gradient(to top, transparent 74%, rgba(255, 255, 255, 0.08) 75%, transparent 76%);
+      }
+
+      .line-chart svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .footer-note {
+        margin-top: 14px;
+        color: var(--soft);
+        font-size: 12px;
+      }
+
+      @media (max-width: 1180px) {
+        .app {
+          grid-template-columns: 90px minmax(0, 1fr);
+        }
+
+        .sidebar {
+          padding: 16px 10px;
+        }
+
+        .logo span,
+        .nav button span,
+        .today-card {
+          display: none;
+        }
+
+        .logo strong {
+          font-size: 28px;
+        }
+
+        .nav button {
+          grid-template-columns: 1fr;
+          justify-items: center;
+        }
+
+        .grid-2,
+        .health-layout,
+        .agent-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-layout {
+          grid-template-columns: minmax(0, 1fr) 280px;
+        }
+
+        .profile-summary {
+          grid-template-columns: 78px 1fr;
+        }
+
+        .divider {
+          display: none;
+        }
+      }
+
+      @media (max-width: 780px) {
+        .app {
+          display: block;
+        }
+
+        .sidebar {
+          position: static;
+          height: auto;
+          border-right: 0;
+          border-bottom: 1px solid var(--line-orange);
+        }
+
+        .logo span,
+        .nav button span {
+          display: block;
+        }
+
+        .nav {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .nav button {
+          grid-template-columns: 1fr;
+          justify-items: center;
+          text-align: center;
+        }
+
+        .main {
+          padding: 18px 14px 28px;
+        }
+
+        .topbar {
+          display: block;
+        }
+
+        .actions {
+          justify-content: flex-start;
+          margin-top: 14px;
+        }
+
+        .stat-grid,
+        .toolbar,
+        .script-sync-grid,
+        .add-agent-grid,
+        .detail-layout,
+        .info-grid,
+        .kpi-row {
+          grid-template-columns: 1fr;
+        }
+
+        .donut-wrap {
+          grid-template-columns: 1fr;
+          justify-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">
+          <strong>FWD</strong>
+          <span>Lead Admin</span>
+        </div>
+
+        <nav class="nav" aria-label="เมนูหลัก">
+          <button class="nav-btn" data-view="overview" aria-selected="true"><b>⌂</b><span>ภาพรวม</span><small></small></button>
+          <button class="nav-btn" data-view="health" aria-selected="false"><b>✚</b><span>ข้อมูลสุขภาพ FWD</span></button>
+          <button class="nav-btn" data-view="agents" aria-selected="false"><b>♙</b><span>ลูกทีม</span></button>
+        </nav>
+
+        <div class="today-card">
+          <h3>ข้อมูลวันนี้</h3>
+          <div class="today-row"><span>Leads เข้าใหม่</span><strong>22</strong></div>
+          <div class="today-row"><span>ส่งไปแล้ว</span><strong>19</strong></div>
+          <div class="today-row"><span>รอติดตาม</span><strong>16</strong></div>
+          <div class="today-row"><span>ปิดการขาย</span><strong>3</strong></div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+          <div class="today-row"><span>อัปเดตล่าสุด</span></div>
+          <div style="color:var(--muted)">10 พ.ค. 2569 16:34</div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="view active" id="view-overview">
+          <div class="topbar">
+            <div class="title">
+              <h1>ภาพรวม</h1>
+              <p>สรุปภาพรวม Leads และผลการติดตาม</p>
+            </div>
+            <div class="actions">
+              <button class="btn primary" id="googleScriptTab" type="button">Google Script</button>
+              <button class="btn">🔔</button>
+              <button class="btn">Admin Manual ▾</button>
+            </div>
+          </div>
+
+          <div class="panel script-sync-panel" id="googleScriptPanel">
+            <h2>Google Script Sync</h2>
+            <p>ใช้พื้นที่นี้ใส่ URL ของ Google Apps Script Web App เพื่ออัปเดตตาราง Leads จากชีตกลาง</p>
+            <div class="script-sync-grid">
+              <input id="scriptWebAppUrl" placeholder="วาง Web App URL จาก Google Apps Script ที่นี่">
+              <button class="btn" id="saveScriptUrl" type="button">บันทึก URL</button>
+              <button class="btn primary" id="syncFromSheet" type="button">อัปเดตตาราง</button>
+            </div>
+            <div class="sync-status" id="syncStatus">ฐานข้อมูลหลัก: FWD Leads Central Database / Leads Central</div>
+          </div>
+
+          <div class="stat-grid">
+            <article class="stat-card"><div><span>Leads เข้าใหม่วันนี้</span><strong>22</strong><span>จากทั้งหมด 22 รายการ</span></div><div class="stat-icon">♙</div></article>
+            <article class="stat-card"><div><span>ส่งไปแล้ว</span><strong>19</strong><span>คิดเป็น 86.36%</span></div><div class="stat-icon">➤</div></article>
+            <article class="stat-card"><div><span>รอติดตาม</span><strong>16</strong><span>คิดเป็น 72.73%</span></div><div class="stat-icon">◷</div></article>
+            <article class="stat-card"><div><span>ปิดการขาย</span><strong>3</strong><span>คิดเป็น 13.64%</span></div><div class="stat-icon">✓</div></article>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <div class="panel">
+                <div class="panel-head">
+                  <h2>1. Recruit New Code Leads <small>(Source File: Winner Prestige Leads)</small></h2>
+                  <button class="btn">ดูทั้งหมดในหน้า Lead Admin</button>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>เบอร์โทร</th><th>สนใจผลิตภัณฑ์</th><th>แหล่งที่มา</th><th>วันที่/เวลา</th><th>จัดการ</th><th></th></tr></thead>
+                    <tbody id="newLeadRows"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-top:14px">
+                <div class="panel-head">
+                  <h2>2. Leads รวมจาก Source Files <small>(ล่าสุด 10 รายการ)</small></h2>
+                  <button class="btn">ดูทั้งหมดในหน้า Lead Admin</button>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>เบอร์โทร</th><th>สนใจผลิตภัณฑ์</th><th>Source File</th><th>Source Tab</th><th>วันที่/เวลา</th><th>สถานะ</th></tr></thead>
+                    <tbody id="sourceLeadRows"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="panel" style="margin-top:14px">
+                <div class="panel-head">
+                  <h2>3. ผลการติดตาม Leads <small>(ล่าสุด 10 รายการ)</small></h2>
+                  <button class="btn">ดูทั้งหมดในหน้า Lead Admin</button>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>เบอร์โทร</th><th>คนดูแล</th><th>สถานะติดตาม</th><th>วันที่ส่ง Lead</th><th>อัปเดตล่าสุด</th></tr></thead>
+                    <tbody id="followRows"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <aside>
+              <div class="panel chart-panel">
+                <div class="panel-head" style="padding:0 0 18px;border:0"><h3>สรุป Leads ตามคนดูแล <small>(เดือนนี้)</small></h3></div>
+                <div class="donut-wrap">
+                  <div class="donut" aria-label="donut chart"></div>
+                  <div class="legend">
+                    <div class="legend-row"><span class="dot" style="background:var(--orange)"></span><span>เตือน</span><strong>10 (41.67%)</strong></div>
+                    <div class="legend-row"><span class="dot" style="background:var(--blue)"></span><span>เอ</span><strong>6 (25.00%)</strong></div>
+                    <div class="legend-row"><span class="dot" style="background:var(--green)"></span><span>ธนัทธ์</span><strong>5 (20.83%)</strong></div>
+                    <div class="legend-row"><span class="dot" style="background:var(--purple)"></span><span>บี</span><strong>3 (12.50%)</strong></div>
+                  </div>
+                </div>
+                <p class="footer-note">* นับจาก Leads ที่ถูกส่งแล้ว</p>
+              </div>
+
+              <div class="panel" style="margin-top:14px">
+                <div class="panel-head"><h3>สถานะติดตามรวม <small>(เดือนนี้)</small></h3></div>
+                <div class="bars">
+                  <div class="bar-row"><span>ส่งแล้ว</span><strong>12</strong><div class="track"><div class="fill" style="width:50%;background:#aaa"></div></div><span>50.00%</span></div>
+                  <div class="bar-row"><span>ติดต่อแล้ว</span><strong>6</strong><div class="track"><div class="fill" style="width:25%"></div></div><span>25.00%</span></div>
+                  <div class="bar-row"><span>นัดคุย</span><strong>3</strong><div class="track"><div class="fill" style="width:12.5%;background:var(--yellow)"></div></div><span>12.50%</span></div>
+                  <div class="bar-row"><span>ปิดการขาย</span><strong>2</strong><div class="track"><div class="fill" style="width:8.33%;background:var(--green)"></div></div><span>8.33%</span></div>
+                  <div class="bar-row"><span>ไม่รับสาย</span><strong>1</strong><div class="track"><div class="fill" style="width:4.17%;background:var(--red)"></div></div><span>4.17%</span></div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-health">
+          <div class="topbar">
+            <div class="title">
+              <h1>ข้อมูลผู้ตอบคำถามสุขภาพ</h1>
+              <p>แสดงข้อมูลผู้ตอบคำถามสุขภาพทั้งหมด</p>
+            </div>
+          </div>
+
+          <div class="stat-grid">
+            <article class="stat-card"><div><span>ทั้งหมด</span><strong>236</strong><span>รายการ</span></div><div class="stat-icon">▤</div></article>
+            <article class="stat-card health-stat-card"><div><h3>เพศ</h3><div id="genderBars"></div></div></article>
+            <article class="stat-card health-stat-card"><div><h3>จังหวัดสูงสุด</h3><div id="provinceBars"></div></div></article>
+            <article class="stat-card health-stat-card"><div><h3>ประวัติสุขภาพ</h3><div id="healthHistoryBars"></div></div></article>
+          </div>
+
+          <div class="health-layout">
+            <div class="panel">
+              <div class="toolbar">
+                <input placeholder="ค้นหา ชื่อ, เบอร์โทร, LINE ID">
+                <select><option>แหล่งที่มา</option></select>
+                <select><option>สถานะ</option></select>
+                <select><option>วันที่ตอบ</option></select>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>เบอร์โทร</th><th>แหล่งที่มา</th><th>วันที่ตอบ</th><th>แสดงผล</th></tr></thead>
+                  <tbody id="healthRows"></tbody>
+                </table>
+              </div>
+              <div style="display:flex;justify-content:space-between;gap:12px;padding:14px 16px;color:var(--muted)">
+                <span>แสดง 1 - 10 จาก 236 รายการ</span>
+                <span>‹  <b style="color:var(--orange)">1</b>  2  3  ...  24  ›</span>
+              </div>
+            </div>
+
+            <aside class="panel drawer">
+              <div class="person">
+                <div class="avatar">♙</div>
+                <div>
+                  <strong>คุณณภัทร ศรีสุข</strong><br>
+                  <span style="color:var(--muted)">061-878-6269<br>LINE ID: tanapat_fwd</span>
+                </div>
+              </div>
+              <div class="tabs"><button class="active">ข้อมูลสุขภาพ</button></div>
+              <ol class="qa-list">
+                <li><span>ปัจจุบันมีโรคประจำตัวหรือไม่</span><strong>ไม่มี</strong></li>
+                <li><span>เคยรักษาหรือมีโรคร้ายแรง</span><strong>ไม่เคย</strong></li>
+                <li><span>เคยผ่าตัดหรือไม่</span><strong>ไม่เคย</strong></li>
+                <li><span>สูบบุหรี่หรือไม่</span><strong>ไม่สูบ</strong></li>
+                <li><span>ดื่มแอลกอฮอล์หรือไม่</span><strong>ดื่มบ้าง</strong></li>
+                <li><span>น้ำหนัก / ส่วนสูง</span><strong>68 กก. / 170 ซม.</strong></li>
+                <li><span>อาชีพ</span><strong>พนักงานบริษัท</strong></li>
+                <li><span>รายได้ต่อเดือน</span><strong>30,000 - 50,000 บาท</strong></li>
+                <li><span>งบประมาณที่สนใจ</span><strong>20,000 - 30,000 บาท/ปี</strong></li>
+                <li><span>ช่องทางติดต่อสะดวก</span><strong>LINE</strong></li>
+              </ol>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view detail-page" id="view-customer-detail">
+          <button class="back-link" data-view-target="health">‹ กลับไปหน้ารายการ</button>
+          <div class="topbar">
+            <div class="title">
+              <h1>รายละเอียดผู้ตอบคำถามสุขภาพ</h1>
+              <div class="case-meta">
+                <span>วันที่ตอบแบบสอบถาม 10 พ.ค. 2569 16:32 น.</span>
+                <span>|</span>
+                <span>แหล่งที่มา Facebook Ads</span>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn primary">ส่งข้อมูล LINE (Flex)</button>
+              <button class="btn">พิมพ์ / Save PDF</button>
+              <button class="btn">แชร์</button>
+            </div>
+          </div>
+
+          <div class="detail-layout">
+            <div>
+              <article class="panel profile-summary">
+                <div class="avatar big">♙</div>
+                <div>
+                  <h2 class="profile-name">คุณปาริชาติ ศิวะพรหมเจริญ</h2>
+                  <div class="profile-contact">
+                    <span>☎ 919193929</span>
+                    <span>✉ parichat.siv@gmail.com</span>
+                    <span>LINE -</span>
+                  </div>
+                </div>
+                <div class="divider"></div>
+                <div>
+                  <span style="color:var(--muted)">สรุปเคส</span><br>
+                  <span class="case-badge" style="margin-top:8px">ต้องตามเพิ่ม</span>
+                  <div class="copy-line">▣ คัดลอกข้อมูลไปกรอกใบสมัคร</div>
+                </div>
+              </article>
+
+              <article class="panel info-section">
+                <h2>1. ข้อมูลผู้เอาประกัน</h2>
+                <div class="info-grid">
+                  <div class="info-item"><span>คำนำหน้า</span><strong>นางสาว</strong></div>
+                  <div class="info-item"><span>เพศ</span><strong>หญิง</strong></div>
+                  <div class="info-item"><span>ชื่อ-นามสกุล</span><strong>ปาริชาติ ศิวะพรหมเจริญ</strong></div>
+                  <div class="info-item"><span>วันเกิด</span><strong>1976-08-13</strong></div>
+                  <div class="info-item"><span>เลขบัตรประชาชน</span><strong>3100600300695</strong></div>
+                  <div class="info-item"><span>วันหมดอายุบัตรประชาชน</span><strong>2031-12-08</strong></div>
+                  <div class="info-item"><span>สถานภาพ</span><strong>สมรส</strong></div>
+                  <div class="info-item"><span>เบอร์ติดต่อ</span><strong>919193929</strong></div>
+                  <div class="info-item"><span>อีเมล</span><strong>parichat.siv@gmail.com</strong></div>
+                  <div class="info-item"><span>LINE ID</span><strong>-</strong></div>
+                  <div class="info-item"><span>อาชีพ</span><strong>พนักงานบริษัท</strong></div>
+                  <div class="info-item"><span>รายได้ต่อปี</span><strong>960,000</strong></div>
+                </div>
+              </article>
+
+              <article class="panel info-section">
+                <h2>2. ที่อยู่</h2>
+                <div class="info-grid">
+                  <div class="info-item" style="grid-column:1 / -1"><span>ที่อยู่ติดต่อได้</span><strong>155/46 ถนนสุขาภิบาล5 แขวงออเงิน เขตสายไหม กทม 10220</strong></div>
+                  <div class="info-item" style="grid-column:1 / -1"><span>ที่อยู่ตามทะเบียนบ้าน</span><strong>49/101 ถนนนวมินทร์ แขวงนวลจันทร์ เขตบึงกุ่ม กทม 10230</strong></div>
+                  <div class="info-item" style="grid-column:1 / -1"><span>ที่อยู่ที่ทำงาน</span><strong>1252 อาคาร2 ถนนพัฒนาการ แขวงสวนหลวง เขตสวนหลวง กทม 10250</strong></div>
+                </div>
+              </article>
+
+              <article class="panel info-section">
+                <h2>3. ผู้รับผลประโยชน์</h2>
+                <div class="info-grid">
+                  <div class="info-item"><span>คำนำหน้า</span><strong>นาย</strong></div>
+                  <div class="info-item"><span>เพศ</span><strong>ชาย</strong></div>
+                  <div class="info-item"><span>ชื่อ-นามสกุล</span><strong>วีรวัช ศิวะพรหมเจริญ</strong></div>
+                  <div class="info-item"><span>ความสัมพันธ์</span><strong>คู่ชีวิต</strong></div>
+                  <div class="info-item"><span>อายุ</span><strong>50</strong></div>
+                </div>
+              </article>
+
+              <article class="panel info-section">
+                <h2>4. ข้อมูลสุขภาพ</h2>
+                <div class="info-grid">
+                  <div class="info-item"><span>ส่วนสูง</span><strong>165</strong></div>
+                  <div class="info-item"><span>น้ำหนัก</span><strong>75</strong></div>
+                  <div class="info-item"><span>โรคประจำตัว</span><strong>ไม่มี</strong></div>
+                  <div class="info-item"><span>รายละเอียดโรคประจำตัว</span><strong>-</strong></div>
+                  <div class="info-item"><span>น้ำหนักเปลี่ยนแปลง</span><strong>ไม่เปลี่ยนแปลง</strong></div>
+                  <div class="info-item"><span>รายละเอียดน้ำหนัก</span><strong>-</strong></div>
+                </div>
+              </article>
+
+              <article class="panel info-section">
+                <h2>5. ประวัติประกันเดิม</h2>
+                <div class="info-grid">
+                  <div class="info-item"><span>มี/เคยมีประกัน</span><strong>มี</strong></div>
+                  <div class="info-item"><span>บริษัทประกันเดิม</span><strong>อลิอันซ์ อยุธยา</strong></div>
+                  <div class="info-item"><span>ประเภทประกันเดิม</span><strong>สุขภาพ</strong></div>
+                  <div class="info-item"><span>ทุน/วงเงิน</span><strong>600,000</strong></div>
+                  <div class="info-item"><span>ยังมีผลบังคับ</span><strong>ยังมีผลบังคับ</strong></div>
+                  <div class="info-item"><span>ประวัติพิจารณา</span><strong>ไม่เคย</strong></div>
+                </div>
+              </article>
+
+              <article class="panel info-section">
+                <h2>6. คำถามสุขภาพ</h2>
+                <div class="info-grid">
+                  <div class="info-item"><span>ดื่มแอลกอฮอล์</span><strong>ไม่ดื่ม</strong></div>
+                  <div class="info-item"><span>รายละเอียดแอลกอฮอล์</span><strong>-</strong></div>
+                  <div class="info-item"><span>สูบบุหรี่</span><strong>ไม่สูบ</strong></div>
+                  <div class="info-item"><span>รายละเอียดบุหรี่</span><strong>-</strong></div>
+                  <div class="info-item"><span>โรคร้ายแรงในครอบครัว</span><strong>ไม่ทราบ</strong></div>
+                  <div class="info-item"><span>รายละเอียดครอบครัว</span><strong>-</strong></div>
+                  <div class="info-item"><span>โรคของผู้สมัคร</span><strong>ไม่เคย</strong></div>
+                  <div class="info-item"><span>รายการโรค</span><strong>-</strong></div>
+                  <div class="info-item"><span>รายละเอียดโรค</span><strong>-</strong></div>
+                </div>
+              </article>
+
+              <article class="panel info-section">
+                <h2>7. ประวัติการรักษา</h2>
+                <div class="info-grid">
+                  <div class="info-item"><span>เคยตรวจ/รักษา/ผ่าตัด</span><strong>เคย</strong></div>
+                  <div class="info-item"><span>ชื่อสถานพยาบาล</span><strong>โรงพยาบาลพญาไท นวมินทร์</strong></div>
+                  <div class="info-item"><span>อาการหรือโรคที่รักษา</span><strong>ผ่าตัดมดลูก และรังไข่</strong></div>
+                  <div class="info-item"><span>วันที่เข้ารับการรักษา</span><strong>2024-01-24</strong></div>
+                  <div class="info-item"><span>ผลตรวจ/วินิจฉัย/รักษา</span><strong>ผ่าตัดออก</strong></div>
+                  <div class="info-item"><span>ชื่อแพทย์</span><strong>-</strong></div>
+                  <div class="info-item" style="grid-column:1 / -1"><span>หมายเหตุ</span><strong>ทำเบี้ยรับแล้วค่ะ</strong></div>
+                </div>
+              </article>
+            </div>
+
+            <aside class="case-side">
+              <article class="panel side-form">
+                <label>ค้นหา ชื่อ, อีเมล, เบอร์โทร</label>
+                <input id="customerSearchInput" placeholder="ค้นหาด้วยชื่อ อีเมล หรือเบอร์โทร">
+                <h3 class="side-list-title">รายชื่อผู้ตอบแบบสอบถาม</h3>
+                <p class="side-list-total">ทั้งหมด 236 รายการ</p>
+                <div class="customer-result-list" id="customerMiniList"></div>
+              </article>
+
+              <article class="panel timeline">
+                <h3>ความเคลื่อนไหว</h3>
+                <div class="timeline-item"><time>10 พ.ค. 2569 16:32</time><strong>ลูกค้าตอบแบบสอบถาม (ระบบ)</strong></div>
+                <div class="timeline-item"><time>10 พ.ค. 2569 16:35</time><strong>ส่งข้อมูล LINE (Flex)</strong><br>โดย ธนัทร์ ศรีสุข</div>
+                <div class="timeline-item"><time>10 พ.ค. 2569 16:40</time><strong>เปลี่ยนสถานะเป็น รอติดตาม</strong><br>โดย ธนัทร์ ศรีสุข</div>
+                <button class="btn" type="button" style="width:100%">ดูประวัติทั้งหมด</button>
+              </article>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-agents">
+          <div class="topbar">
+            <div class="title">
+              <h1>สมาชิก The Winner Prestige Team</h1>
+              <p>จัดการข้อมูลลูกทีมและติดตามผลงาน</p>
+            </div>
+            <div class="actions"><button class="btn primary" id="addAgentBtn">＋ เพิ่มลูกทีมใหม่</button><button class="btn">ดาวน์โหลดรายงาน</button></div>
+          </div>
+
+          <div class="stat-grid">
+            <article class="stat-card"><div><span>ลูกทีมทั้งหมด</span><strong>12</strong><span>ทั้งหมด 100%</span></div><div class="stat-icon">♙</div></article>
+            <article class="stat-card"><div><span>กำลังดูแลลูกค้า</span><strong>8</strong><span>66.67%</span></div><div class="stat-icon">●</div></article>
+            <article class="stat-card"><div><span>พักเบรค</span><strong>2</strong><span>16.67%</span></div><div class="stat-icon">☕</div></article>
+            <article class="stat-card"><div><span>รองาน</span><strong>2</strong><span>16.67%</span></div><div class="stat-icon">⌛</div></article>
+          </div>
+
+          <article class="panel add-agent-panel" id="addAgentPanel" hidden>
+            <div class="panel-head"><h2>เพิ่มข้อมูลลูกทีมที่เข้ามาใหม่</h2></div>
+            <div class="add-agent-grid">
+              <input id="newAgentName" placeholder="ชื่อ-นามสกุล">
+              <input id="newAgentPhone" placeholder="เบอร์โทร">
+              <input id="newAgentLine" placeholder="LINE ID">
+              <select id="newAgentStatus"><option>เปิดรับ leads</option><option>ปิดรับ</option><option>พักงาน</option></select>
+            </div>
+            <button class="btn primary" id="newAgentSubmit" type="button" style="margin-top:12px">Submit</button>
+          </article>
+
+          <div class="agent-layout">
+            <div class="panel">
+              <div class="panel-head"><h2>รายชื่อลูกทีม</h2></div>
+              <div class="toolbar" style="grid-template-columns:minmax(220px,1fr) 180px 160px">
+                <input placeholder="ค้นหาชื่อ / เบอร์โทร / LINE ID">
+                <select><option>สถานะทั้งหมด</option></select>
+                <select><option>ทั้งหมด</option></select>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>#</th><th>ชื่อ-นามสกุล</th><th>เบอร์โทร</th><th>LINE ID</th><th>สถานะ</th><th>Leads ที่ดูแล</th><th>ปิดการขาย</th><th>ผลงาน (%)</th><th>จัดการ</th></tr></thead>
+                  <tbody id="agentRows"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <aside class="panel agent-card" id="agentCard">
+              <div class="person"><div class="avatar">♙</div><div><h2 style="margin:0">ธนัทธ์ ศรีสุข</h2><span style="color:var(--muted)">061-878-6269<br>LINE ID: tanapat_fwd</span></div></div>
+              <div class="tabs"><button class="active" data-agent-tab="overview">ภาพรวม</button><button data-agent-tab="leads">ลูกค้าที่ดูแล</button><button data-agent-tab="activity">ความเคลื่อนไหว</button></div>
+              <div id="agentCardContent"></div>
+            </aside>
+          </div>
+
+          <div class="agent-manage-panel" id="agentManagePanel" hidden>
+            <h3 style="margin:0">จัดการสถานะลูกทีม</h3>
+            <p id="agentManageName" style="color:var(--muted); margin:6px 0 0">-</p>
+            <select id="agentStatusSelect">
+              <option>เปิดรับ leads</option>
+              <option>ปิดรับ</option>
+              <option>พักงาน</option>
+            </select>
+            <div class="agent-actions">
+              <button class="btn primary" id="agentStatusSubmit" type="button">Submit</button>
+              <button class="btn" id="agentManageClose" type="button">ปิด</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const leads = [
+        ["คุณธนัทธ์ ศรีสุข", "061-878-6269", "ประกันสุขภาพ", "Facebook Ads", "10 พ.ค. 2569 16:32"],
+        ["คุณจิราภรณ์ แก้วมณี", "083-456-7890", "ประกันชีวิต", "LINE OA", "10 พ.ค. 2569 16:28"],
+        ["คุณวิทยา ทองดี", "089-123-4567", "ประกันสุขภาพ", "TikTok Ads", "10 พ.ค. 2569 16:21"],
+        ["คุณสุธิรา รุ่งเรือง", "090-987-6543", "ประกันอุบัติเหตุ", "Website", "10 พ.ค. 2569 16:15"],
+        ["คุณปัญญา วงศ์ไทย", "062-345-6789", "ประกันสุขภาพ", "Facebook Ads", "10 พ.ค. 2569 16:10"],
+        ["คุณณัฐญา มากมี", "094-789-1234", "ประกันชีวิต", "LINE OA", "10 พ.ค. 2569 16:05"],
+        ["คุณภัทรศักดิ์ สีทอง", "081-654-3210", "ประกันสุขภาพ", "TikTok Ads", "10 พ.ค. 2569 15:58"],
+        ["คุณเมลดา ภักดี", "063-258-1479", "ประกันโรคร้าย", "Website", "10 พ.ค. 2569 15:51"],
+        ["คุณเอกชัย พัฒนกิจ", "080-112-2334", "ประกันชีวิต", "Facebook Ads", "10 พ.ค. 2569 15:45"],
+        ["คุณณัฐภา บุญศรี", "098-765-4321", "ประกันสุขภาพ", "LINE OA", "10 พ.ค. 2569 15:40"]
+      ];
+
+      const names = ["ธนัทธ์ ศรีสุข", "จิราภรณ์ แก้วมณี", "คุณส้ม ใจดี"];
+      let selectedAgentIndex = 0;
+      let activeAgentTab = "overview";
+      const teamMembers = [
+        { name: "ธนัทธ์ ศรีสุข", phone: "061-878-6269", line: "tanapat_fwd", status: "รองาน", statusClass: "blue", leads: 18, contacted: 10, appointments: 4, closed: 5 },
+        { name: "จิราภรณ์ แก้วมณี", phone: "062-878-6268", line: "jira.fwd", status: "เปิดรับ leads", statusClass: "green", leads: 17, contacted: 11, appointments: 5, closed: 4 },
+        { name: "คุณส้ม ใจดี", phone: "063-878-6267", line: "som.fwd", status: "เปิดรับ leads", statusClass: "green", leads: 16, contacted: 9, appointments: 3, closed: 3 },
+        { name: "ศุภานัน ใจดี", phone: "064-878-6266", line: "supanan.fwd", status: "พักงาน", statusClass: "yellow", leads: 15, contacted: 8, appointments: 2, closed: 2 },
+        { name: "ปัญญา วงศ์ไทย", phone: "065-878-6265", line: "panya.fwd", status: "เปิดรับ leads", statusClass: "green", leads: 14, contacted: 8, appointments: 2, closed: 2 },
+        { name: "ณัฏฐา มากมี", phone: "066-878-6264", line: "nattha.fwd", status: "ปิดรับ", statusClass: "gray", leads: 12, contacted: 7, appointments: 2, closed: 1 },
+        { name: "นริศร์ รัตนศักดิ์", phone: "067-878-6263", line: "naris.fwd", status: "เปิดรับ leads", statusClass: "green", leads: 11, contacted: 6, appointments: 1, closed: 1 },
+        { name: "กมลวดี สวัสดี", phone: "068-878-6262", line: "kamon.fwd", status: "รองาน", statusClass: "blue", leads: 0, contacted: 0, appointments: 0, closed: 0 },
+        { name: "นภัทร พัฒนกิจ", phone: "069-878-6261", line: "naphat.fwd", status: "พักงาน", statusClass: "yellow", leads: 8, contacted: 4, appointments: 1, closed: 1 },
+        { name: "ธนชัย บุญศรี", phone: "070-878-6260", line: "tana.fwd", status: "เปิดรับ leads", statusClass: "green", leads: 7, contacted: 4, appointments: 1, closed: 1 }
+      ];
+      const agentLeadDetails = [
+        ["คุณสมคิด ใจดี", "081-234-5678", "Facebook Ads", "ติดต่อแล้ว", "นัดคุย 12 พ.ค."],
+        ["คุณเหงากา แก้วเรือง", "082-345-6789", "LINE OA", "นัดหมาย", "นัดหมาย 11 พ.ค. 10:00"],
+        ["คุณอัมพร ทองดี", "083-456-7890", "TikTok Ads", "สนใจแผน", "ส่งแผน 3 แบบ"],
+        ["คุณกมลวรรณ ใจกล้า", "084-567-8901", "Website", "รอติดตาม", "รอข้อมูลเพิ่มเติม"],
+        ["คุณธนพล วงศ์ไทย", "085-678-9012", "Facebook Ads", "ไม่สนใจ", "ไม่สนใจประกัน"],
+        ["คุณวาสนา มานะ", "086-789-0123", "LINE OA", "ปิดการขาย", "เบี้ยปีแรกแล้ว"],
+        ["คุณเอกชัย มีสุข", "087-890-1234", "Website", "ติดต่อแล้ว", "รอเอกสาร"],
+        ["คุณภัทรา ใจเย็น", "088-901-2345", "Facebook Ads", "นัดหมาย", "นัด Zoom"]
+      ];
+      const statuses = [
+        ["ติดต่อแล้ว", "blue"],
+        ["นัดคุย", "yellow"],
+        ["ส่งแล้ว", "gray"],
+        ["ปิดการขาย", "green"],
+        ["ไม่รับสาย", "gray"]
+      ];
+
+      const centralSheetConfig = {
+        id: "1LzNAXK27a87ydnKd-WY3lDL8Pool29RR8zxAEy2vaPQ",
+        title: "FWD Leads Central Database",
+        leadsSheet: "Leads Central",
+        membersSheet: "Team Members",
+        url: "https://docs.google.com/spreadsheets/d/1LzNAXK27a87ydnKd-WY3lDL8Pool29RR8zxAEy2vaPQ/edit"
+      };
+      let centralLeads = [];
+      const centralLeadSnapshot = [
+        ["ธนภัทร", "061-878-6269", "ประกันสุขภาพ", "Admin Manual", "5/10/2026 16:34:14", "Assigned", "ธนดิษ"],
+        ["AAA BBBB", "087-603-4508", "ตัวแทนหน้าใหม่", "Winner Prestige Leads", "6/5/2569 9:16:57", "Assigned", "คุณเมย์"],
+        ["Bbbb", "5428", "ย้ายค่าย / โอนย้าย", "Winner Prestige Leads", "6/5/2569 9:19:40", "Assigned", "ธนดิษ"],
+        ["Jj jjj", "082-675-499", "ย้ายค่าย / โอนย้าย", "Winner Prestige Leads", "6/5/2569 9:22:43", "New", ""],
+        ["สมชาย ใจดี", "02-931-7000", "ตัวแทนหน้าใหม่", "Winner Prestige Leads", "6/5/2569 9:30:05", "New", ""],
+        ["Tanadit Laobush-anan", "086-304-7429", "ตัวแทนหน้าใหม่", "Winner Prestige Leads", "6/5/2569 10:15:30", "New", ""],
+        ["สมชาย", "094-549-797", "ตัวแทนหน้าใหม่", "Winner Prestige Leads", "6/5/2569 10:31:58", "New", ""],
+        ["Jsjdhdjdj", "064-5484", "ย้ายค่าย / โอนย้าย", "Winner Prestige Leads", "6/5/2569 10:33:47", "New", ""],
+        ["Jsjdhd", "097-645-49", "ตัวแทนหน้าใหม่", "Winner Prestige Leads", "6/5/2569 10:37:01", "New", ""],
+        ["Jjjkkkk", "085-246-785", "ย้ายค่าย / โอนย้าย", "Winner Prestige Leads", "6/5/2569 10:41:47", "New", ""]
+      ];
+      const sourceLeadSnapshot = [
+        ["AAA BBBB", "087-603-4508", "ตัวแทนหน้าใหม่", "Winner Prestige Leads", "ชีต1", "6/5/2569 9:16:57", "Assigned"],
+        ["ธนภัทร", "061-878-6269", "ประกันสุขภาพ", "FWD Leads 162165", "Web Premium", "5/10/2026 16:34:14", "New"],
+        ["ปาริชาติ ศิวะพรหมเจริญ", "091-919-3929", "สุขภาพ", "Health WebApp Leads V2 Database", "Health WebApp Leads V2", "5/11/2026 22:51:42", "New"],
+        ["Tanadit Laobush-anan", "086-304-7429", "ประกันชีวิต", "FWD Leads 162165", "Web Premium", "6/5/2569 10:15:30", "New"],
+        ["สมชาย ใจดี", "02-931-7000", "ตัวแทนหน้าใหม่", "Winner Prestige Leads", "ชีต1", "6/5/2569 9:30:05", "New"],
+        ["ลูกค้า LINE", "081-234-5678", "ประกันสุขภาพ", "Leads Line for Duan Only", "Sheet1", "5/11/2026 16:13:09", "New"],
+        ["ลูกค้า Heritage", "082-345-6789", "Heritage", "Leads Line for Duan Only", "Heritage", "5/11/2026 16:14:21", "New"],
+        ["ลูกค้าชีต 1", "083-456-7890", "ประกันอุบัติเหตุ", "Leads Line for Duan Only", "Sheet1", "5/11/2026 16:15:44", "New"],
+        ["Bbbb", "5428", "ย้ายค่าย / โอนย้าย", "Winner Prestige Leads", "ชีต1", "6/5/2569 9:19:40", "Assigned"],
+        ["เซี่ยมหง เหล่าบุศณ์นันต์", "086-304-7429", "สุขภาพ", "Health WebApp Leads V2 Database", "Health WebApp Leads V2", "5/13/2026 10:19:33", "New"]
+      ];
+
+      function getLeadRows() {
+        return centralLeads.length ? centralLeads : centralLeadSnapshot;
+      }
+
+      function renderRows() {
+        const leadRows = getLeadRows();
+        const recruitRows = leadRows.filter((lead) => lead[3] === "Winner Prestige Leads");
+        document.querySelector("#newLeadRows").innerHTML = recruitRows.map((lead, index) => `
+          <tr>
+            <td>${index + 1}</td><td>${lead[0]}</td><td>${lead[1]}</td><td>${lead[2]}</td><td>${lead[3]}</td><td>${lead[4]}</td>
+            <td><select class="select"><option>เลือกคนดูแล</option><option>ธนัทธ์ ศรีสุข</option><option>จิราภรณ์ แก้วมณี</option></select></td>
+            <td><div class="lead-actions"><button class="mini-btn submit" type="button">Submit</button><button class="mini-btn flex" type="button">ส่ง Flex</button></div></td>
+          </tr>`).join("");
+
+        document.querySelector("#sourceLeadRows").innerHTML = sourceLeadSnapshot.map((lead, index) => {
+          const statusClass = lead[6] === "Assigned" ? "green" : "blue";
+          const statusText = lead[6] === "Assigned" ? "ส่งแล้ว" : "รอ Submit";
+          return `<tr><td>${index + 1}</td><td>${lead[0]}</td><td>${lead[1]}</td><td>${lead[2]}</td><td>${lead[3]}</td><td>${lead[4]}</td><td>${lead[5]}</td><td><span class="tag ${statusClass}">${statusText}</span></td></tr>`;
+        }).join("");
+
+        document.querySelector("#followRows").innerHTML = leadRows.map((lead, index) => {
+          const st = statuses[index % statuses.length];
+          return `<tr><td>${index + 1}</td><td>${lead[0]}</td><td>${lead[1]}</td><td>${names[index % names.length]}</td><td><span class="tag ${st[1]}">${st[0]}</span></td><td>9 พ.ค. 2569 ${14 + (index % 4)}:20</td><td>10 พ.ค. 2569 ${14 + (index % 3)}:${20 + index}</td></tr>`;
+        }).join("");
+
+        document.querySelector("#healthRows").innerHTML = leads.map((lead, index) => {
+          const st = index % 3 === 0 ? ["ส่งต่อแล้ว", "green"] : index % 3 === 1 ? ["รอติดตาม", "blue"] : ["ปิดการขาย", "purple"];
+          return `<tr><td>${index + 1}</td><td>${lead[0]}</td><td>${lead[1]}</td><td>${lead[3]}</td><td>${lead[4]}</td><td><span class="tag ${st[1]}">${st[0]}</span></td><td>${names[index % names.length]}</td><td><button class="mini-btn detail-open" type="button">ดู</button></td></tr>`;
+        }).join("");
+
+        document.querySelector("#agentRows").innerHTML = teamMembers.map((agent, index) => {
+          const rate = agent.leads ? ((agent.closed / agent.leads) * 100).toFixed(2) : "0.00";
+          return `<tr data-agent-index="${index}">
+            <td>${index + 1}</td><td>${agent.name}</td><td>${agent.phone}</td><td>${agent.line}</td>
+            <td><span class="tag ${agent.statusClass}">${agent.status}</span></td><td>${agent.leads}</td><td>${agent.closed}</td><td>${rate}%</td>
+            <td><div class="agent-actions"><button class="mini-btn agent-select" type="button" data-agent-index="${index}">ดู</button><button class="mini-btn agent-manage" type="button" data-agent-index="${index}">จัดการ</button></div></td>
+          </tr>`;
+        }).join("");
+        renderAgentCard();
+      }
+
+      function renderAgentCard() {
+        const agent = teamMembers[selectedAgentIndex] || teamMembers[0];
+        if (!agent) return;
+        const rate = agent.leads ? ((agent.closed / agent.leads) * 100).toFixed(2) : "0.00";
+        document.querySelector("#agentCard .person").innerHTML = `<div class="avatar">♙</div><div><h2 style="margin:0">${agent.name}</h2><span style="color:var(--muted)">${agent.phone}<br>LINE ID: ${agent.line}</span></div>`;
+        document.querySelectorAll("#agentCard [data-agent-tab]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.agentTab === activeAgentTab);
+        });
+        const content = document.querySelector("#agentCardContent");
+        if (!content) return;
+        if (activeAgentTab === "leads") {
+          content.innerHTML = `<h3>ลูกค้า leads ที่ได้รับ</h3><div class="agent-lead-list">${
+            agentLeadDetails.slice(0, 5).map((lead) => `<div class="agent-lead-item"><strong>${lead[0]}</strong><span>${lead[1]} · ${lead[2]}</span><span>${lead[3]} · ${lead[4]}</span></div>`).join("")
+          }</div><button class="btn" type="button" style="width:100%; margin-top:12px">More &gt;&gt;</button><button class="btn danger-btn delete-agent" type="button">ลบลูกทีมคนนี้</button>`;
+          return;
+        }
+        if (activeAgentTab === "activity") {
+          content.innerHTML = `<h3>status และสถิติการทำงาน</h3>
+            <div class="kpi-row"><div class="small-kpi"><span>สถานะ</span><strong style="font-size:20px">${agent.status}</strong></div><div class="small-kpi"><span>ติดต่อแล้ว</span><strong>${agent.contacted}</strong></div><div class="small-kpi"><span>นัดหมาย</span><strong>${agent.appointments}</strong></div><div class="small-kpi"><span>ปิดการขาย</span><strong>${agent.closed}</strong></div></div>
+            <div class="timeline-item"><time>วันนี้ 10:20</time><strong>อัปเดตสถานะ ${agent.status}</strong></div>
+            <div class="timeline-item"><time>วันนี้ 09:15</time><strong>ติดตามลูกค้า ${agent.contacted} ราย</strong></div>
+            <div class="timeline-item"><time>เมื่อวาน</time><strong>ปิดการขายสะสม ${agent.closed} ราย</strong></div><button class="btn danger-btn delete-agent" type="button">ลบลูกทีมคนนี้</button>`;
+          return;
+        }
+        content.innerHTML = `<div class="kpi-row">
+            <div class="small-kpi"><span>Leads ที่ดูแล</span><strong>${agent.leads}</strong></div>
+            <div class="small-kpi"><span>ติดต่อแล้ว</span><strong>${agent.contacted}</strong></div>
+            <div class="small-kpi"><span>นัดหมาย</span><strong>${agent.appointments}</strong></div>
+            <div class="small-kpi"><span>ปิดการขาย</span><strong>${agent.closed}</strong></div>
+          </div>
+          <h3>อัตราการปิดการขาย <span style="color:var(--orange)">${rate}%</span></h3>
+          <div class="line-chart"><svg viewBox="0 0 520 210" role="img" aria-label="กราฟอัตราปิดการขาย"><polyline points="20,160 100,132 185,104 265,134 350,86 438,58 500,42" fill="none" stroke="#ff6500" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline><g fill="#ff6500"><circle cx="20" cy="160" r="6"></circle><circle cx="100" cy="132" r="6"></circle><circle cx="185" cy="104" r="6"></circle><circle cx="265" cy="134" r="6"></circle><circle cx="350" cy="86" r="6"></circle><circle cx="438" cy="58" r="6"></circle><circle cx="500" cy="42" r="6"></circle></g></svg></div><button class="btn danger-btn delete-agent" type="button">ลบลูกทีมคนนี้</button>`;
+      }
+
+      function showView(viewName) {
+        document.querySelectorAll(".view").forEach((view) => view.classList.toggle("active", view.id === `view-${viewName}`));
+        document.querySelectorAll(".nav-btn").forEach((item) => {
+          const selected = item.dataset.view === viewName || (viewName === "customer-detail" && item.dataset.view === "health");
+          item.setAttribute("aria-selected", String(selected));
+        });
+        if (viewName === "customer-detail") {
+          renderCustomerSideLists(getDisplayHealthRows(healthLeads)[selectedHealthIndex]);
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      document.querySelectorAll(".nav-btn").forEach((button) => {
+        button.addEventListener("click", () => showView(button.dataset.view));
+      });
+
+      document.addEventListener("click", (event) => {
+        const detailButton = event.target.closest(".detail-open");
+        const customerButton = event.target.closest(".customer-result[data-customer-index]");
+        const targetButton = event.target.closest("[data-view-target]");
+        const submitButton = event.target.closest(".mini-btn.submit");
+        const flexButton = event.target.closest(".mini-btn.flex");
+        const addAgentButton = event.target.closest("#addAgentBtn");
+        const agentTab = event.target.closest("[data-agent-tab]");
+        const agentSelect = event.target.closest(".agent-select");
+        const agentManage = event.target.closest(".agent-manage");
+        const agentManageClose = event.target.closest("#agentManageClose");
+        const agentStatusSubmit = event.target.closest("#agentStatusSubmit");
+        const newAgentSubmit = event.target.closest("#newAgentSubmit");
+        const deleteAgent = event.target.closest(".delete-agent");
+        if (submitButton) {
+          const actions = submitButton.closest(".lead-actions");
+          actions?.classList.add("saved");
+          submitButton.textContent = "บันทึกแล้ว";
+        }
+        if (flexButton) {
+          flexButton.textContent = "ส่งแล้ว";
+        }
+        if (detailButton) {
+          selectedHealthIndex = Number(detailButton.dataset.healthIndex || 0);
+          renderCustomerDetail(selectedHealthIndex);
+          showView("customer-detail");
+        }
+        if (customerButton) {
+          selectedHealthIndex = Number(customerButton.dataset.customerIndex || 0);
+          renderCustomerDetail(selectedHealthIndex);
+          renderCustomerSideLists(getDisplayHealthRows(healthLeads)[selectedHealthIndex], document.querySelector("#customerSearchInput")?.value || "");
+          document.querySelector("#view-customer-detail .profile-summary")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        if (addAgentButton) {
+          const panel = document.querySelector("#addAgentPanel");
+          if (panel) panel.hidden = !panel.hidden;
+          panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        if (agentTab) {
+          activeAgentTab = agentTab.dataset.agentTab;
+          renderAgentCard();
+        }
+        if (agentSelect) {
+          selectedAgentIndex = Number(agentSelect.dataset.agentIndex || 0);
+          activeAgentTab = "overview";
+          renderAgentCard();
+          document.querySelector("#agentCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        if (agentManage) {
+          selectedAgentIndex = Number(agentManage.dataset.agentIndex || 0);
+          const agent = teamMembers[selectedAgentIndex];
+          document.querySelector("#agentManageName").textContent = agent?.name || "-";
+          const select = document.querySelector("#agentStatusSelect");
+          if (select && agent) select.value = agent.status;
+          document.querySelector("#agentManagePanel").hidden = false;
+          renderAgentCard();
+        }
+        if (agentManageClose) {
+          document.querySelector("#agentManagePanel").hidden = true;
+        }
+        if (agentStatusSubmit) {
+          const status = document.querySelector("#agentStatusSelect")?.value || "เปิดรับ leads";
+          const agent = teamMembers[selectedAgentIndex];
+          if (agent) {
+            agent.status = status;
+            agent.statusClass = status.includes("เปิดรับ") ? "green" : status.includes("พัก") ? "yellow" : "gray";
+          }
+          renderRows();
+          renderAgentCard();
+          document.querySelector("#agentManagePanel").hidden = true;
+        }
+        if (newAgentSubmit) {
+          const nameInput = document.querySelector("#newAgentName");
+          const phoneInput = document.querySelector("#newAgentPhone");
+          const lineInput = document.querySelector("#newAgentLine");
+          const statusInput = document.querySelector("#newAgentStatus");
+          const name = nameInput?.value.trim() || "ลูกทีมใหม่";
+          const phone = phoneInput?.value.trim() || "-";
+          const line = lineInput?.value.trim() || "-";
+          const status = statusInput?.value || "เปิดรับ leads";
+          teamMembers.push({
+            name,
+            phone,
+            line,
+            status,
+            statusClass: status.includes("เปิดรับ") ? "green" : status.includes("พัก") ? "yellow" : "gray",
+            leads: 0,
+            contacted: 0,
+            appointments: 0,
+            closed: 0
+          });
+          selectedAgentIndex = teamMembers.length - 1;
+          activeAgentTab = "overview";
+          [nameInput, phoneInput, lineInput].forEach((input) => { if (input) input.value = ""; });
+          if (statusInput) statusInput.value = "เปิดรับ leads";
+          document.querySelector("#addAgentPanel").hidden = true;
+          renderRows();
+          document.querySelector("#agentCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        if (deleteAgent) {
+          if (teamMembers.length <= 1) return;
+          teamMembers.splice(selectedAgentIndex, 1);
+          selectedAgentIndex = Math.max(0, selectedAgentIndex - 1);
+          activeAgentTab = "overview";
+          renderRows();
+        }
+        if (targetButton) showView(targetButton.dataset.viewTarget);
+      });
+
+      const healthSheetConfig = {
+        id: "1ez6E481Lpf0uO5uyU_HGQUhGUl3Xr2ZgYWOXFpA0Le8",
+        title: "Health WebApp Leads V2 Database",
+        sheet: "Health WebApp Leads V2"
+      };
+      let healthLeads = [];
+      let selectedHealthIndex = 0;
+      const healthSnapshot = [
+        {
+          timestamp: "5/13/2026 10:19:33",
+          prefix: "นาง",
+          gender: "หญิง",
+          name: "เซี่ยมหง เหล่าบุศณ์นันต์",
+          birthday: "1991-05-13",
+          citizenId: "3101401150300",
+          citizenExpiry: "2026-05-13",
+          marital: "สมรส",
+          address: "222 ลาดพร้าว ลาดพร้าว กทม",
+          phone: "0863047429",
+          email: "jaonine78@gmail.com",
+          lineId: "-",
+          job: "แม่บ้าน",
+          income: "1,000,000 / ปี",
+          registeredAddress: "222 ลาดพร้าว ลาดพร้าว กทม",
+          workAddress: "222 ลาดพร้าว ลาดพร้าว กทม",
+          beneficiaryPrefix: "นาย",
+          beneficiaryGender: "ชาย",
+          beneficiaryName: "ธนดิษ เหล่าบุศณ์นันต์",
+          beneficiaryRelation: "บุตร",
+          beneficiaryAge: "50",
+          height: "165",
+          weight: "85",
+          chronicDisease: "มี",
+          chronicDiseaseDetail: "เบาหวาน, ความดัน",
+          weightChange: "ไม่เปลี่ยนแปลง",
+          oldInsurance: "ไม่มี",
+          alcohol: "ไม่ดื่ม",
+          smoking: "เคยสูบแต่เลิกแล้ว",
+          smokingDetail: "เลิกมา 1 ปี",
+          familyDisease: "เคย",
+          familyDiseaseDetail: "พ่อ / ความดัน / เสียไปแล้ว / ไม่ใช่",
+          applicantDisease: "ไม่เคย",
+          treatment: "เคย",
+          hospital: "เปาโล โชคชัยสี่",
+          treatmentIssue: "นิ่ว",
+          treatmentDate: "2025-05-13",
+          diagnosis: "หายดี",
+          doctor: "-",
+          note: "-",
+          confirm: "ยืนยัน",
+          source: "Google Drive / Health"
+        },
+        {
+          timestamp: "5/11/2026 22:51:42",
+          prefix: "นางสาว",
+          gender: "หญิง",
+          name: "ปาริชาติ ศิวะพรหมเจริญ",
+          birthday: "1976-08-13",
+          citizenId: "3100600300695",
+          citizenExpiry: "2031-12-08",
+          marital: "สมรส",
+          address: "155/46 ถนนสุขาภิบาล5 แขวงออเงิน เขตสายไหม กทม 10220",
+          phone: "0919193929",
+          email: "parichat.siv@gmail.com",
+          lineId: "-",
+          job: "พนักงานบริษัท",
+          income: "960,000",
+          registeredAddress: "49/101 ถนนนวลจันทร์ แขวงนวลจันทร์ เขตบึงกุ่ม กทม 10230",
+          workAddress: "1252 อาคาร2 ถนนพัฒนาการ แขวงสวนหลวง เขตสวนหลวง กทม 10250",
+          beneficiaryPrefix: "นาย",
+          beneficiaryGender: "ชาย",
+          beneficiaryName: "วิทวัชร์ ศิวะพรหมเจริญ",
+          beneficiaryRelation: "คู่ชีวิต",
+          beneficiaryAge: "50",
+          height: "165",
+          weight: "75",
+          chronicDisease: "ไม่มี",
+          chronicDiseaseDetail: "-",
+          weightChange: "ไม่เปลี่ยนแปลง",
+          oldInsurance: "มี",
+          oldCompany: "อลิอันซ์ อยุธยา",
+          oldType: "สุขภาพ",
+          oldCoverage: "600,000",
+          oldActive: "ยังมีผลบังคับ",
+          oldDecision: "ไม่เคย",
+          alcohol: "ไม่ดื่ม",
+          smoking: "ไม่สูบ",
+          familyDisease: "ไม่ทราบ",
+          applicantDisease: "ไม่เคย",
+          treatment: "เคย",
+          hospital: "โรงพยาบาลพญาไท นวมินทร์",
+          treatmentIssue: "ผ่าตัดมดลูก และรังไข่",
+          treatmentDate: "2024-01-24",
+          diagnosis: "ผ่าตัดออก",
+          doctor: "-",
+          note: "ทำแชร์ริ่งนะคะ",
+          confirm: "ยืนยัน",
+          source: "Google Drive / Health"
+        },
+        {
+          timestamp: "5/8/2026 9:27:22",
+          prefix: "นางสาว",
+          gender: "หญิง",
+          name: "พรทิพย์ ม่วงจีบ",
+          birthday: "1992-12-08",
+          citizenId: "1730600081986",
+          citizenExpiry: "2029-12-08",
+          marital: "โสด",
+          address: "1/999",
+          phone: "0812345675",
+          email: "noomai554311@gmail.com",
+          lineId: "Mai55",
+          job: "พนักงาน",
+          income: "100000",
+          registeredAddress: "อ้อมใหญ่",
+          workAddress: "กทม",
+          beneficiaryPrefix: "เด็กหญิง",
+          beneficiaryGender: "หญิง",
+          beneficiaryName: "กวางตุ้ง",
+          beneficiaryRelation: "บุตร",
+          beneficiaryAge: "11",
+          height: "165",
+          weight: "60",
+          chronicDisease: "ไม่มี",
+          weightChange: "ไม่เปลี่ยนแปลง",
+          oldInsurance: "ไม่มี",
+          oldDecision: "ไม่เคย",
+          alcohol: "ไม่ดื่ม",
+          smoking: "ไม่สูบ",
+          familyDisease: "ไม่เคย",
+          applicantDisease: "ไม่เคย",
+          treatment: "ไม่เคย",
+          note: "ไม่มีจ้า",
+          confirm: "ยืนยัน",
+          source: "Google Drive / Health"
+        },
+        {
+          timestamp: "5/9/2026 21:21:49",
+          prefix: "นาย",
+          gender: "ชาย",
+          name: "TANADIT LAOBUSH-ANAN",
+          birthday: "1974-11-03",
+          citizenId: "3101401150300",
+          citizenExpiry: "2034-11-02",
+          marital: "โสด",
+          address: "969/22",
+          phone: "0863047429",
+          email: "ltanadit@gmail.com",
+          lineId: "Jao-nine",
+          job: "ตัวแทนประกัน",
+          income: "1,000,000",
+          registeredAddress: "969/22",
+          workAddress: "969/22",
+          beneficiaryPrefix: "เด็กชาย",
+          beneficiaryGender: "ชาย",
+          beneficiaryName: "ธนภัทร เหล่าบุศณ์อนันต์",
+          beneficiaryRelation: "บุตร",
+          beneficiaryAge: "13",
+          height: "179",
+          weight: "99",
+          chronicDisease: "มี",
+          chronicDiseaseDetail: "ติดยา / นานแล้ว / รักษาเอง / เลิกแล้ว",
+          weightChange: "ลดลง",
+          weightDetail: "จาก 120 กก.",
+          oldInsurance: "มี",
+          oldCompany: "FWD",
+          oldType: "ประกันชีวิต",
+          oldCoverage: "10,000,000",
+          oldActive: "ยังมีผลบังคับ",
+          oldDecision: "ไม่เคย",
+          alcohol: "ดื่มประจำ",
+          alcoholDetail: "เบียร์ / ทุกวัน / 10 กระป๋อง / มากกว่า 10 ปี",
+          smoking: "สูบ",
+          smokingDetail: "วันละซอง / มากกว่า 10 ปี / เลิกมา 4 เดือน",
+          familyDisease: "เคย",
+          familyDiseaseDetail: "พ่อเป็นความดัน",
+          applicantDisease: "ไม่เคย",
+          treatment: "ไม่เคย",
+          note: "-",
+          confirm: "ยืนยัน",
+          source: "Google Drive / Health"
+        }
+      ].map((item, index) => ({ index, ...item }));
+
+      function clean(value) {
+        if (value === null || value === undefined || value === "") return "-";
+        return String(value).trim() || "-";
+      }
+
+      function cellValue(cell) {
+        if (!cell) return "";
+        if (cell.f !== undefined) return cell.f;
+        if (cell.v !== undefined) return cell.v;
+        return "";
+      }
+
+      function toThaiDate(value) {
+        const text = clean(value);
+        if (text === "-") return "-";
+        return text.replace(",", "").split(" ")[0];
+      }
+
+      function inferProvince(item) {
+        const text = `${item.province || ""} ${item.address || ""} ${item.registeredAddress || ""}`;
+        if (/ปทุมธานี/.test(text)) return "ปทุมธานี";
+        if (/สมุทรปราการ/.test(text)) return "สมุทรปราการ";
+        if (/นครปฐม/.test(text)) return "นครปฐม";
+        if (/นนทบุรี/.test(text)) return "นนทบุรี";
+        if (/อยุธยา|พระนครศรีอยุธยา/.test(text)) return "อยุธยา";
+        if (/กทม|กรุงเทพ/.test(text)) return "กรุงเทพฯ";
+        return item.province || "ไม่ระบุ";
+      }
+
+      function hasHealthHistory(item) {
+        const negative = (value) => /^(ไม่มี|ไม่เคย|-)?$/.test(clean(value));
+        if (!negative(item.chronicDisease) || !negative(item.treatment) || !negative(item.applicantDisease) || !negative(item.familyDisease)) {
+          return true;
+        }
+        const detail = [item.chronicDiseaseDetail, item.treatmentIssue, item.diagnosis].join(" ");
+        return /โรค|ผ่าตัด|รักษา|ความดัน|เบาหวาน|นิ่ว|ปอด|COVID/i.test(detail);
+      }
+
+      function getDisplayHealthRows(rows) {
+        if (rows.length >= 15) return rows;
+        const extra = [
+          ["ฐิติพร สุวรรณปรีชา", "097-992-9419", "หญิง", "กรุงเทพฯ", "เคย", "โรงพยาบาลมิตรภาพ", "13/2/2025"],
+          ["นงลักษณ์ จูทะจันทร์", "083-789-5466", "หญิง", "กรุงเทพฯ", "ไม่เคย", "-", "14/2/2025"],
+          ["Aranuch Pheunchob", "091-779-6673", "หญิง", "กรุงเทพฯ", "ไม่เคย", "-", "15/2/2025"],
+          ["ปรินทร จันทรวงศ์", "094-942-5195", "หญิง", "กรุงเทพฯ", "เคย", "COVID-19", "17/2/2025"],
+          ["สโรชา กสิกรรม", "098-285-8981", "หญิง", "กรุงเทพฯ", "เคย", "ผ่าตัด", "21/2/2025"],
+          ["นิศารัตน์ เปรมบำรุง", "097-985-5154", "หญิง", "กรุงเทพฯ", "เคย", "ปอดอักเสบ", "22/2/2025"],
+          ["อังคณา เครือยิ้ม", "089-000-7788", "หญิง", "นครราชสีมา", "ไม่เคย", "-", "23/2/2025"],
+          ["อมรประภา วรพรทัศนา", "084-726-8673", "หญิง", "กรุงเทพฯ", "เคย", "ตรวจสุขภาพ", "17/3/2026"],
+          ["นันท์นลิน สุปัตติ", "096-919-9299", "หญิง", "ปทุมธานี", "เคย", "นอนให้น้ำเกลือ", "18/3/2026"],
+          ["นารี เหล่าบุศณ์อนันต์", "089-897-9197", "หญิง", "กรุงเทพฯ", "ไม่เคย", "-", "20/3/2026"],
+          ["จีรพงษ์ ศิลาสุวรรณ", "086-406-9530", "ชาย", "กรุงเทพฯ", "เคย", "ตรวจสุขภาพประจำปี", "22/3/2026"]
+        ];
+        return rows.concat(extra.map((item, index) => ({
+          index: rows.length + index,
+          name: item[0],
+          phone: item[1],
+          gender: item[2],
+          province: item[3],
+          source: "Google Drive / Health",
+          timestamp: item[6],
+          chronicDisease: item[4] === "เคย" ? "มี" : "ไม่มี",
+          treatment: item[4],
+          treatmentIssue: item[5],
+          job: "พนักงานบริษัท",
+          income: "-",
+          height: "-",
+          weight: "-",
+          lineId: "-"
+        }))).slice(0, 15);
+      }
+
+      function countBy(items, getter) {
+        return items.reduce((acc, item) => {
+          const key = getter(item) || "ไม่ระบุ";
+          acc[key] = (acc[key] || 0) + 1;
+          return acc;
+        }, {});
+      }
+
+      function renderBarSet(targetId, entries, total) {
+        const target = document.querySelector(targetId);
+        if (!target) return;
+        target.innerHTML = entries.map(([label, count]) => {
+          const pct = total ? Math.round((count / total) * 100) : 0;
+          return `<div class="bar-row"><span>${label}</span><strong>${count}</strong><div class="track"><div class="fill" style="width:${pct}%"></div></div><span>${pct}%</span></div>`;
+        }).join("");
+      }
+
+      function healthStatus(item) {
+        const riskText = [
+          item.chronicDisease,
+          item.chronicDiseaseDetail,
+          item.applicantDisease,
+          item.applicantDiseaseList,
+          item.familyDisease,
+          item.smoking,
+          item.alcohol,
+          item.treatment
+        ].join(" ");
+        if (/มี|เคย|สูบ|ดื่มประจำ|โรค|ผ่าตัด|รักษา/i.test(riskText)) return ["รอติดตาม", "blue"];
+        return ["ส่งต่อแล้ว", "green"];
+      }
+
+      function mapHealthRow(row, index) {
+        const get = (name) => clean(row[name]);
+        return {
+          index,
+          timestamp: get("Timestamp"),
+          prefix: get("คำนำหน้าผู้เอาประกัน"),
+          gender: get("เพศผู้เอาประกัน"),
+          name: get("ชื่อ-นามสกุล"),
+          birthday: get("วันเกิด"),
+          citizenId: get("เลขบัตรประชาชน"),
+          citizenExpiry: get("วันหมดอายุบัตรประชาชน"),
+          marital: get("สถานภาพ"),
+          address: get("ที่อยู่ติดต่อได้"),
+          phone: get("เบอร์ติดต่อ"),
+          email: get("อีเมล"),
+          lineId: get("LINE ID"),
+          job: get("อาชีพ"),
+          income: get("รายได้ต่อปี"),
+          registeredAddress: get("ที่อยู่ตามทะเบียนบ้าน"),
+          workAddress: get("ที่อยู่ที่ทำงาน"),
+          beneficiaryPrefix: get("คำนำหน้าผู้รับผลประโยชน์"),
+          beneficiaryGender: get("เพศผู้รับผลประโยชน์"),
+          beneficiaryName: get("ชื่อ-นามสกุลผู้รับผลประโยชน์"),
+          beneficiaryRelation: get("ความสัมพันธ์"),
+          beneficiaryAge: get("อายุผู้รับผลประโยชน์"),
+          height: get("ส่วนสูง"),
+          weight: get("น้ำหนัก"),
+          chronicDisease: get("มีโรคประจำตัวไหม"),
+          chronicDiseaseDetail: get("โรคประจำตัว"),
+          weightChange: get("น้ำหนักเปลี่ยนแปลง"),
+          weightDetail: get("รายละเอียดน้ำหนัก"),
+          oldInsurance: get("มี/เคยมีประกัน"),
+          oldCompany: get("ชื่อบริษัทประกันเดิม"),
+          oldType: get("ประเภทประกันเดิม"),
+          oldCoverage: get("ทุน/วงเงินคุ้มครอง"),
+          oldActive: get("ยังมีผลบังคับอยู่ไหม"),
+          oldDecision: get("เคยถูกปฏิเสธ/เลื่อนรับ/เพิ่มเบี้ย/ยกเว้น"),
+          oldDecisionDetail: get("รายละเอียดการพิจารณา"),
+          alcohol: get("ดื่มแอลกอฮอล์"),
+          alcoholDetail: get("รายละเอียดแอลกอฮอล์"),
+          smoking: get("สูบบุหรี่"),
+          smokingDetail: get("รายละเอียดบุหรี่"),
+          familyDisease: get("โรคร้ายแรงในครอบครัว"),
+          familyDiseaseDetail: get("รายละเอียดโรคร้ายแรงในครอบครัว"),
+          applicantDisease: get("โรคของผู้สมัคร"),
+          applicantDiseaseList: get("รายการโรคของผู้สมัคร"),
+          applicantDiseaseDetail: get("รายละเอียดโรคของผู้สมัคร"),
+          treatment: get("เคยตรวจ/รักษา/ผ่าตัด"),
+          hospital: get("ชื่อสถานพยาบาล"),
+          treatmentIssue: get("อาการหรือโรคที่รักษา"),
+          treatmentDate: get("วันที่เข้ารับการรักษา"),
+          diagnosis: get("ผลตรวจ/การวินิจฉัย/การรักษา"),
+          doctor: get("ชื่อนายแพทย์"),
+          note: get("หมายเหตุ"),
+          confirm: get("ยืนยันข้อมูล"),
+          source: "Google Drive / Health"
+        };
+      }
+
+      function parseGoogleSheetResponse(response) {
+        if (!response || !response.table || !response.table.rows) return [];
+        const headers = response.table.cols.map((col) => clean(col.label));
+        return response.table.rows
+          .map((row) => {
+            const record = {};
+            headers.forEach((header, index) => {
+              record[header] = cellValue(row.c[index]);
+            });
+            return record;
+          })
+          .filter((row) => clean(row["ชื่อ-นามสกุล"]) !== "-")
+          .map(mapHealthRow);
+      }
+
+      function renderHealthRows() {
+        const rows = healthLeads.length
+          ? healthLeads
+          : leads.map((lead, index) => ({
+              index,
+              name: lead[0],
+              phone: lead[1],
+              source: lead[3],
+              timestamp: lead[4],
+              lineId: "tanapat_fwd",
+              job: "พนักงานบริษัท",
+              income: "30,000 - 50,000 บาท",
+              height: "170",
+              weight: "68",
+              chronicDisease: "ไม่มี",
+              treatment: "ไม่เคย",
+              smoking: "ไม่สูบ",
+              alcohol: "ดื่มบ้าง"
+            }));
+
+        const displayRows = getDisplayHealthRows(rows);
+        document.querySelector("#healthRows").innerHTML = displayRows.slice(0, 15).map((item, index) => {
+          return `<tr>
+            <td>${index + 1}</td>
+            <td>${clean(item.name)}</td>
+            <td>${clean(item.phone)}</td>
+            <td>${clean(item.source)}</td>
+            <td>${toThaiDate(item.timestamp)}</td>
+            <td><button class="mini-btn view-big detail-open" type="button" data-health-index="${index}">ดู</button></td>
+          </tr>`;
+        }).join("");
+
+        const total = displayRows.length;
+        document.querySelector("#view-health .stat-card strong").textContent = total;
+        const genderCounts = countBy(displayRows, (item) => clean(item.gender));
+        const provinceCounts = countBy(displayRows, inferProvince);
+        const historyCounts = countBy(displayRows, (item) => hasHealthHistory(item) ? "มี" : "ไม่มี");
+        renderBarSet("#genderBars", Object.entries(genderCounts), total);
+        renderBarSet("#provinceBars", Object.entries(provinceCounts).sort((a, b) => b[1] - a[1]).slice(0, 4), total);
+        renderBarSet("#healthHistoryBars", Object.entries(historyCounts), total);
+        const footer = document.querySelector("#view-health .table-wrap + div span:first-child");
+        if (footer) footer.textContent = `แสดง 15 รายการ`;
+        renderHealthDrawer(selectedHealthIndex);
+      }
+
+      function renderHealthDrawer(index = 0) {
+        const item = getDisplayHealthRows(healthLeads)[index];
+        if (!item) return;
+        const drawer = document.querySelector("#view-health .drawer");
+        if (!drawer) return;
+        drawer.querySelector(".person strong").textContent = item.name;
+        drawer.querySelector(".person span").innerHTML = `${item.phone}<br>LINE ID: ${item.lineId}`;
+        drawer.querySelector(".qa-list").innerHTML = [
+          ["ปัจจุบันมีโรคประจำตัวหรือไม่", item.chronicDisease],
+          ["รายละเอียดโรคประจำตัว", item.chronicDiseaseDetail],
+          ["เคยตรวจ/รักษา/ผ่าตัดหรือไม่", item.treatment],
+          ["สูบบุหรี่หรือไม่", item.smoking],
+          ["ดื่มแอลกอฮอล์หรือไม่", item.alcohol],
+          ["น้ำหนัก / ส่วนสูง", `${item.weight} กก. / ${item.height} ซม.`],
+          ["ประวัติครอบครัว", item.familyDisease],
+          ["อาชีพ", item.job],
+          ["รายได้ต่อปี", item.income],
+          ["วันที่ตอบแบบสอบถาม", toThaiDate(item.timestamp)]
+        ].map(([label, value]) => `<li><span>${label}</span><strong>${clean(value)}</strong></li>`).join("");
+      }
+
+      function setInfo(sectionIndex, label, value) {
+        const section = document.querySelectorAll("#view-customer-detail .info-section")[sectionIndex - 1];
+        if (!section) return;
+        const item = Array.from(section.querySelectorAll(".info-item")).find((node) => {
+          const title = node.querySelector("span");
+          return title && title.textContent.trim() === label;
+        });
+        if (item) item.querySelector("strong").textContent = clean(value);
+      }
+
+      function renderCustomerDetail(index = 0) {
+        const item = getDisplayHealthRows(healthLeads)[index];
+        if (!item) return;
+        const status = healthStatus(item)[0];
+        document.querySelector("#view-customer-detail .profile-name").textContent = item.name;
+        document.querySelector("#view-customer-detail .profile-contact").innerHTML =
+          `<span>โทร ${item.phone}</span><span>อีเมล ${item.email}</span><span>LINE ${item.lineId}</span>`;
+        document.querySelector("#view-customer-detail .case-meta").innerHTML =
+          `<span>วันที่ตอบแบบสอบถาม ${toThaiDate(item.timestamp)}</span><span>|</span><span>แหล่งที่มา ${item.source}</span>`;
+        document.querySelector("#view-customer-detail .case-badge").textContent = status;
+
+        setInfo(1, "คำนำหน้า", item.prefix);
+        setInfo(1, "เพศ", item.gender);
+        setInfo(1, "ชื่อ-นามสกุล", item.name);
+        setInfo(1, "วันเกิด", item.birthday);
+        setInfo(1, "เลขบัตรประชาชน", item.citizenId);
+        setInfo(1, "วันหมดอายุบัตรประชาชน", item.citizenExpiry);
+        setInfo(1, "สถานภาพ", item.marital);
+        setInfo(1, "เบอร์ติดต่อ", item.phone);
+        setInfo(1, "อีเมล", item.email);
+        setInfo(1, "LINE ID", item.lineId);
+        setInfo(1, "อาชีพ", item.job);
+        setInfo(1, "รายได้ต่อปี", item.income);
+        setInfo(2, "ที่อยู่ติดต่อได้", item.address);
+        setInfo(2, "ที่อยู่ตามทะเบียนบ้าน", item.registeredAddress);
+        setInfo(2, "ที่อยู่ที่ทำงาน", item.workAddress);
+        setInfo(3, "คำนำหน้า", item.beneficiaryPrefix);
+        setInfo(3, "เพศ", item.beneficiaryGender);
+        setInfo(3, "ชื่อ-นามสกุล", item.beneficiaryName);
+        setInfo(3, "ความสัมพันธ์", item.beneficiaryRelation);
+        setInfo(3, "อายุ", item.beneficiaryAge);
+        setInfo(4, "ส่วนสูง", item.height);
+        setInfo(4, "น้ำหนัก", item.weight);
+        setInfo(4, "โรคประจำตัว", item.chronicDisease);
+        setInfo(4, "รายละเอียดโรคประจำตัว", item.chronicDiseaseDetail);
+        setInfo(4, "น้ำหนักเปลี่ยนแปลง", item.weightChange);
+        setInfo(4, "รายละเอียดน้ำหนัก", item.weightDetail);
+        setInfo(5, "มี/เคยมีประกัน", item.oldInsurance);
+        setInfo(5, "บริษัทประกันเดิม", item.oldCompany);
+        setInfo(5, "ประเภทประกันเดิม", item.oldType);
+        setInfo(5, "ทุน/วงเงิน", item.oldCoverage);
+        setInfo(5, "ยังมีผลบังคับ", item.oldActive);
+        setInfo(5, "ประวัติพิจารณา", item.oldDecision);
+        setInfo(6, "ดื่มแอลกอฮอล์", item.alcohol);
+        setInfo(6, "รายละเอียดแอลกอฮอล์", item.alcoholDetail);
+        setInfo(6, "สูบบุหรี่", item.smoking);
+        setInfo(6, "รายละเอียดบุหรี่", item.smokingDetail);
+        setInfo(6, "โรคร้ายแรงในครอบครัว", item.familyDisease);
+        setInfo(6, "รายละเอียดครอบครัว", item.familyDiseaseDetail);
+        setInfo(6, "โรคของผู้สมัคร", item.applicantDisease);
+        setInfo(6, "รายการโรค", item.applicantDiseaseList);
+        setInfo(6, "รายละเอียดโรค", item.applicantDiseaseDetail);
+        setInfo(7, "เคยตรวจ/รักษา/ผ่าตัด", item.treatment);
+        setInfo(7, "ชื่อสถานพยาบาล", item.hospital);
+        setInfo(7, "อาการหรือโรคที่รักษา", item.treatmentIssue);
+        setInfo(7, "วันที่เข้ารับการรักษา", item.treatmentDate);
+        setInfo(7, "ผลตรวจ/วินิจฉัย/รักษา", item.diagnosis);
+        setInfo(7, "ชื่อแพทย์", item.doctor);
+        setInfo(7, "หมายเหตุ", item.note);
+      }
+
+      function customerCard(item, displayIndex) {
+        return `<button class="customer-result ${displayIndex === selectedHealthIndex ? "active" : ""}" type="button" data-customer-index="${displayIndex}">
+          <strong>${clean(item.name)}</strong>
+          <span>${clean(item.email)}</span>
+          <span>${clean(item.phone)}</span>
+        </button>`;
+      }
+
+      function renderCustomerSideLists(activeItem = null, query = "") {
+        const rows = getDisplayHealthRows(healthLeads);
+        const normalized = query.trim().toLowerCase();
+        const matched = normalized ? rows.map((item, index) => ({ item, index })).filter(({ item }) => {
+          const text = [item.name, item.email, item.phone].join(" ").toLowerCase();
+          return text.includes(normalized);
+        }).slice(0, 8) : [];
+        const miniList = document.querySelector("#customerMiniList");
+        if (miniList) {
+          const fallback = rows.map((item, index) => ({ item, index })).filter(({ item }) => item !== activeItem).slice(0, 8);
+          const visibleRows = normalized ? matched : fallback;
+          miniList.innerHTML = visibleRows.map(({ item, index }) => customerCard(item, index)).join("");
+        }
+      }
+
+      function loadHealthFromGoogleSheet() {
+        const button = document.querySelector("#healthRefreshBtn");
+        if (button) button.textContent = "กำลังดึงข้อมูล...";
+        const callbackName = `healthSheetCallback_${Date.now()}`;
+        const script = document.createElement("script");
+        window[callbackName] = (response) => {
+          try {
+            const parsedRows = parseGoogleSheetResponse(response);
+            healthLeads = parsedRows.length ? parsedRows : healthSnapshot;
+            selectedHealthIndex = 0;
+            renderHealthRows();
+            renderCustomerDetail(0);
+            if (button) button.textContent = parsedRows.length
+              ? `รีเฟรชจาก Google Drive (${healthLeads.length})`
+              : `ใช้ snapshot จาก Google Drive (${healthLeads.length})`;
+          } catch (error) {
+            console.error(error);
+            if (button) button.textContent = "ดึงข้อมูลไม่สำเร็จ";
+          } finally {
+            script.remove();
+            delete window[callbackName];
+          }
+        };
+        script.onerror = () => {
+          healthLeads = healthSnapshot;
+          renderHealthRows();
+          renderCustomerDetail(0);
+          if (button) button.textContent = `ใช้ snapshot จาก Google Drive (${healthLeads.length})`;
+          script.remove();
+          delete window[callbackName];
+        };
+        script.src = `https://docs.google.com/spreadsheets/d/${healthSheetConfig.id}/gviz/tq?sheet=${encodeURIComponent(healthSheetConfig.sheet)}&tqx=out:json;responseHandler:${callbackName}`;
+        document.body.appendChild(script);
+      }
+
+      const scriptPanel = document.querySelector("#googleScriptPanel");
+      const scriptTab = document.querySelector("#googleScriptTab");
+      const scriptUrlInput = document.querySelector("#scriptWebAppUrl");
+      const syncStatus = document.querySelector("#syncStatus");
+      const savedScriptUrl = localStorage.getItem("fwdGoogleScriptUrl") || "";
+
+      if (scriptUrlInput) scriptUrlInput.value = savedScriptUrl;
+      if (scriptTab && scriptPanel) {
+        scriptTab.addEventListener("click", () => {
+          scriptPanel.classList.toggle("active");
+        });
+      }
+
+      document.querySelector("#saveScriptUrl")?.addEventListener("click", () => {
+        const url = scriptUrlInput?.value.trim() || "";
+        localStorage.setItem("fwdGoogleScriptUrl", url);
+        if (syncStatus) {
+          syncStatus.textContent = url ? "บันทึก Google Apps Script Web App URL แล้ว" : "ล้าง URL แล้ว ใช้ข้อมูลจากชีตกลางที่ดึงไว้";
+        }
+      });
+
+      document.querySelector("#syncFromSheet")?.addEventListener("click", async () => {
+        const url = scriptUrlInput?.value.trim() || "";
+        if (syncStatus) syncStatus.textContent = "กำลังอัปเดตตารางจากชีต...";
+        if (!url) {
+          centralLeads = centralLeadSnapshot;
+          renderRows();
+          if (syncStatus) syncStatus.textContent = "อัปเดตตารางจาก snapshot ของ FWD Leads Central Database แล้ว";
+          return;
+        }
+
+        try {
+          const response = await fetch(url);
+          const payload = await response.json();
+          const rows = Array.isArray(payload) ? payload : payload.leads || payload.data || [];
+          centralLeads = rows.map((item) => [
+            item.name || item.Name || "-",
+            item.phone || item.Phone || "-",
+            item.product || item["Product / Plan"] || "-",
+            item.source || item["Source File"] || "Google Script",
+            item.createdAt || item["Created At"] || "-",
+            item.status || item.Status || "New",
+            item.assignedTo || item["Assigned To"] || ""
+          ]);
+          renderRows();
+          if (syncStatus) syncStatus.textContent = `อัปเดตจาก Google Script แล้ว ${centralLeads.length} รายการ`;
+        } catch (error) {
+          console.error(error);
+          if (syncStatus) syncStatus.textContent = "ดึงจาก Google Script ไม่สำเร็จ ตรวจ URL/สิทธิ์ แล้วลองอีกครั้ง";
+        }
+      });
+
+      document.querySelector("#customerSearchInput")?.addEventListener("input", (event) => {
+        renderCustomerSideLists(getDisplayHealthRows(healthLeads)[selectedHealthIndex], event.target.value);
+      });
+
+      document.querySelector("#customerSearchInput")?.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        document.querySelector("#customerMiniList .customer-result")?.click();
+      });
+
+      renderRows();
+      healthLeads = healthSnapshot;
+      renderHealthRows();
+      renderCustomerSideLists(getDisplayHealthRows(healthLeads)[0]);
+      loadHealthFromGoogleSheet();
+    </script>
+  </body>
+</html>
