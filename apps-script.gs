@@ -1,6 +1,6 @@
 const CENTRAL_SPREADSHEET_ID = "1LzNAXK27a87ydnKd-WY3lDL8Pool29RR8zxAEy2vaPQ";
 const HEALTH_SPREADSHEET_ID = "1ez6E481Lpf0uO5uyU_HGQUhGUl3Xr2ZgYWOXFpA0Le8";
-const LINE_CHANNEL_ACCESS_TOKEN = "PUT_LINE_CHANNEL_ACCESS_TOKEN_HERE";
+const LINE_CHANNEL_ACCESS_TOKEN = "https://script.google.com/macros/s/AKfycbwswUWqS5ZvgAuPRiUjj3LrECRrw_7nq9Uahjx4IrVGGdYrzXy08Hqef14nfw0PvVYEtQ/exec";
 
 function doGet(e) {
   const action = e.parameter.action || "bootstrap";
