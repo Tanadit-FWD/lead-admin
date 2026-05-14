@@ -981,6 +981,20 @@
         background: rgba(255, 69, 58, 0.12);
       }
 
+      .toast {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 50;
+        max-width: min(420px, calc(100vw - 36px));
+        padding: 14px 16px;
+        color: var(--text);
+        border: 1px solid var(--line-orange);
+        border-radius: 8px;
+        background: #111516;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+      }
+
       .kpi-row {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -1158,8 +1172,8 @@
             </div>
             <div class="actions">
               <button class="btn primary" id="googleScriptTab" type="button">Google Script</button>
-              <button class="btn">🔔</button>
-              <button class="btn">Admin Manual ▾</button>
+              <button class="btn" id="notifyBtn" type="button">🔔</button>
+              <button class="btn" id="manualBtn" type="button">Admin Manual ▾</button>
             </div>
           </div>
 
@@ -1186,7 +1200,7 @@
               <div class="panel">
                 <div class="panel-head">
                   <h2>1. Recruit New Code Leads <small>(Source File: Winner Prestige Leads)</small></h2>
-                  <button class="btn">ดูทั้งหมดในหน้า Lead Admin</button>
+                  <button class="btn open-health-list" type="button">ดูทั้งหมดในหน้า Lead Admin</button>
                 </div>
                 <div class="table-wrap">
                   <table>
@@ -1199,7 +1213,7 @@
               <div class="panel" style="margin-top:14px">
                 <div class="panel-head">
                   <h2>2. Leads รวมจาก Source Files <small>(ล่าสุด 10 รายการ)</small></h2>
-                  <button class="btn">ดูทั้งหมดในหน้า Lead Admin</button>
+                  <button class="btn open-health-list" type="button">ดูทั้งหมดในหน้า Lead Admin</button>
                 </div>
                 <div class="table-wrap">
                   <table>
@@ -1212,7 +1226,7 @@
               <div class="panel" style="margin-top:14px">
                 <div class="panel-head">
                   <h2>3. ผลการติดตาม Leads <small>(ล่าสุด 10 รายการ)</small></h2>
-                  <button class="btn">ดูทั้งหมดในหน้า Lead Admin</button>
+                  <button class="btn open-health-list" type="button">ดูทั้งหมดในหน้า Lead Admin</button>
                 </div>
                 <div class="table-wrap">
                   <table>
@@ -1270,7 +1284,7 @@
           <div class="health-layout">
             <div class="panel">
               <div class="toolbar">
-                <input placeholder="ค้นหา ชื่อ, เบอร์โทร, LINE ID">
+                <input id="healthSearchInput" placeholder="ค้นหา ชื่อ, เบอร์โทร, LINE ID">
                 <select><option>แหล่งที่มา</option></select>
                 <select><option>สถานะ</option></select>
                 <select><option>วันที่ตอบ</option></select>
@@ -1324,9 +1338,9 @@
               </div>
             </div>
             <div class="actions">
-              <button class="btn primary">ส่งข้อมูล LINE (Flex)</button>
-              <button class="btn">พิมพ์ / Save PDF</button>
-              <button class="btn">แชร์</button>
+              <button class="btn primary" id="detailSendLine" type="button">ส่งข้อมูล LINE (Flex)</button>
+              <button class="btn" id="detailPrintPdf" type="button">พิมพ์ / Save PDF</button>
+              <button class="btn" id="detailShare" type="button">แชร์</button>
             </div>
           </div>
 
@@ -1467,7 +1481,7 @@
               <h1>สมาชิก The Winner Prestige Team</h1>
               <p>จัดการข้อมูลลูกทีมและติดตามผลงาน</p>
             </div>
-            <div class="actions"><button class="btn primary" id="addAgentBtn">＋ เพิ่มลูกทีมใหม่</button><button class="btn">ดาวน์โหลดรายงาน</button></div>
+            <div class="actions"><button class="btn primary" id="addAgentBtn">＋ เพิ่มลูกทีมใหม่</button><button class="btn" id="downloadAgentReport" type="button">ดาวน์โหลดรายงาน</button></div>
           </div>
 
           <div class="stat-grid">
@@ -1492,8 +1506,8 @@
             <div class="panel">
               <div class="panel-head"><h2>รายชื่อลูกทีม</h2></div>
               <div class="toolbar" style="grid-template-columns:minmax(220px,1fr) 180px 160px">
-                <input placeholder="ค้นหาชื่อ / เบอร์โทร / LINE ID">
-                <select><option>สถานะทั้งหมด</option></select>
+                <input id="agentSearchInput" placeholder="ค้นหาชื่อ / เบอร์โทร / LINE ID">
+                <select id="agentStatusFilter"><option>สถานะทั้งหมด</option><option>เปิดรับ leads</option><option>ปิดรับ</option><option>พักงาน</option><option>รองาน</option></select>
                 <select><option>ทั้งหมด</option></select>
               </div>
               <div class="table-wrap">
@@ -1545,7 +1559,7 @@
       const names = ["ธนัทธ์ ศรีสุข", "จิราภรณ์ แก้วมณี", "คุณส้ม ใจดี"];
       let selectedAgentIndex = 0;
       let activeAgentTab = "overview";
-      const teamMembers = [
+      let teamMembers = [
         { name: "ธนัทธ์ ศรีสุข", phone: "061-878-6269", line: "tanapat_fwd", status: "รองาน", statusClass: "blue", leads: 18, contacted: 10, appointments: 4, closed: 5 },
         { name: "จิราภรณ์ แก้วมณี", phone: "062-878-6268", line: "jira.fwd", status: "เปิดรับ leads", statusClass: "green", leads: 17, contacted: 11, appointments: 5, closed: 4 },
         { name: "คุณส้ม ใจดี", phone: "063-878-6267", line: "som.fwd", status: "เปิดรับ leads", statusClass: "green", leads: 16, contacted: 9, appointments: 3, closed: 3 },
@@ -1612,6 +1626,86 @@
         return centralLeads.length ? centralLeads : centralLeadSnapshot;
       }
 
+      const storageKey = "fwdLeadAdminStateV2";
+
+      function showToast(message) {
+        let toast = document.querySelector("#appToast");
+        if (!toast) {
+          toast = document.createElement("div");
+          toast.id = "appToast";
+          toast.className = "toast";
+          document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => { toast.remove(); }, 3200);
+      }
+
+      function saveLocalState() {
+        localStorage.setItem(storageKey, JSON.stringify({ centralLeads, teamMembers, healthLeads }));
+      }
+
+      function loadLocalState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+          if (Array.isArray(saved.centralLeads)) centralLeads = saved.centralLeads;
+          if (Array.isArray(saved.teamMembers)) teamMembers = saved.teamMembers;
+          if (Array.isArray(saved.healthLeads) && saved.healthLeads.length) healthLeads = saved.healthLeads;
+        } catch (error) {
+          console.warn("Cannot load local state", error);
+        }
+      }
+
+      function statusClassFromText(status = "") {
+        if (status.includes("เปิดรับ") || status.includes("กำลัง")) return "green";
+        if (status.includes("พัก")) return "yellow";
+        if (status.includes("รองาน") || status.includes("รอ")) return "blue";
+        return "gray";
+      }
+
+      function normalizeTeamMember(item, index = 0) {
+        if (Array.isArray(item)) {
+          const status = item[3] || item[4] || "เปิดรับ leads";
+          return { name: item[0] || `ลูกทีม ${index + 1}`, phone: item[1] || "-", line: item[2] || "-", status, statusClass: statusClassFromText(status), leads: Number(item[5] || 0), contacted: Number(item[6] || 0), appointments: Number(item[7] || 0), closed: Number(item[8] || 0) };
+        }
+        const status = item.status || item.Status || item["สถานะ"] || "เปิดรับ leads";
+        return {
+          name: item.name || item.Name || item["ชื่อ-นามสกุล"] || item["ชื่อ"] || `ลูกทีม ${index + 1}`,
+          phone: item.phone || item.Phone || item["เบอร์โทร"] || "-",
+          line: item.line || item.lineId || item["LINE ID"] || item["Line ID"] || "-",
+          status,
+          statusClass: statusClassFromText(status),
+          leads: Number(item.leads || item["Leads ที่ดูแล"] || item.assignedLeads || 0),
+          contacted: Number(item.contacted || item["ติดต่อแล้ว"] || 0),
+          appointments: Number(item.appointments || item["นัดหมาย"] || 0),
+          closed: Number(item.closed || item["ปิดการขาย"] || 0)
+        };
+      }
+
+      function lineShare(text) {
+        window.open(`https://line.me/R/share?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      }
+
+      async function shareText(title, text) {
+        if (navigator.share) {
+          await navigator.share({ title, text });
+          return;
+        }
+        await navigator.clipboard.writeText(text);
+        showToast("คัดลอกข้อความแชร์แล้ว");
+      }
+
+      function downloadCsv(filename, rows) {
+        const csv = rows.map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+        const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+
       function renderRows() {
         const leadRows = getLeadRows();
         const recruitRows = leadRows.filter((lead) => lead[3] === "Winner Prestige Leads");
@@ -1638,7 +1732,14 @@
           return `<tr><td>${index + 1}</td><td>${lead[0]}</td><td>${lead[1]}</td><td>${lead[3]}</td><td>${lead[4]}</td><td><span class="tag ${st[1]}">${st[0]}</span></td><td>${names[index % names.length]}</td><td><button class="mini-btn detail-open" type="button">ดู</button></td></tr>`;
         }).join("");
 
-        document.querySelector("#agentRows").innerHTML = teamMembers.map((agent, index) => {
+        const agentQuery = (document.querySelector("#agentSearchInput")?.value || "").trim().toLowerCase();
+        const agentStatus = document.querySelector("#agentStatusFilter")?.value || "สถานะทั้งหมด";
+        const visibleAgents = teamMembers.map((agent, index) => ({ agent, index })).filter(({ agent }) => {
+          const matchedText = [agent.name, agent.phone, agent.line].join(" ").toLowerCase().includes(agentQuery);
+          const matchedStatus = agentStatus === "สถานะทั้งหมด" || agent.status === agentStatus;
+          return matchedText && matchedStatus;
+        });
+        document.querySelector("#agentRows").innerHTML = visibleAgents.map(({ agent, index }) => {
           const rate = agent.leads ? ((agent.closed / agent.leads) * 100).toFixed(2) : "0.00";
           return `<tr data-agent-index="${index}">
             <td>${index + 1}</td><td>${agent.name}</td><td>${agent.phone}</td><td>${agent.line}</td>
@@ -1717,9 +1818,18 @@
           const actions = submitButton.closest(".lead-actions");
           actions?.classList.add("saved");
           submitButton.textContent = "บันทึกแล้ว";
+          const row = submitButton.closest("tr");
+          const name = row?.children[1]?.textContent || "Lead";
+          const owner = row?.querySelector("select")?.value || "";
+          saveLocalState();
+          showToast(`บันทึก ${name}${owner && !owner.includes("เลือก") ? ` ให้ ${owner}` : ""} แล้ว`);
         }
         if (flexButton) {
           flexButton.textContent = "ส่งแล้ว";
+          const row = flexButton.closest("tr");
+          const leadText = row ? `Lead: ${row.children[1]?.textContent}\nโทร: ${row.children[2]?.textContent}\nสนใจ: ${row.children[3]?.textContent}` : "FWD Lead";
+          lineShare(leadText);
+          showToast("เปิดหน้าส่ง LINE แล้ว");
         }
         if (detailButton) {
           selectedHealthIndex = Number(detailButton.dataset.healthIndex || 0);
@@ -1736,6 +1846,31 @@
           const panel = document.querySelector("#addAgentPanel");
           if (panel) panel.hidden = !panel.hidden;
           panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        if (event.target.closest("#notifyBtn")) {
+          showToast("ยังไม่มีแจ้งเตือนใหม่");
+        }
+        if (event.target.closest("#manualBtn")) {
+          showToast("คู่มือย่อ: 1) Sync Google Script 2) Submit lead 3) ส่ง LINE / Print / Share จากหน้ารายละเอียด");
+        }
+        if (event.target.closest(".open-health-list")) {
+          showView("health");
+        }
+        if (event.target.closest("#detailSendLine")) {
+          const item = getDisplayHealthRows(healthLeads)[selectedHealthIndex];
+          lineShare(`ข้อมูลสุขภาพ FWD\nชื่อ: ${item?.name || "-"}\nโทร: ${item?.phone || "-"}\nโรคประจำตัว: ${item?.chronicDisease || "-"}\nประวัติรักษา: ${item?.treatment || "-"}`);
+          showToast("เปิดหน้าส่ง LINE แล้ว");
+        }
+        if (event.target.closest("#detailPrintPdf")) {
+          window.print();
+        }
+        if (event.target.closest("#detailShare")) {
+          const item = getDisplayHealthRows(healthLeads)[selectedHealthIndex];
+          shareText("ข้อมูลสุขภาพ FWD", `ชื่อ: ${item?.name || "-"}\nโทร: ${item?.phone || "-"}\nอีเมล: ${item?.email || "-"}\nแหล่งที่มา: ${item?.source || "-"}`).catch(() => showToast("แชร์ไม่สำเร็จ"));
+        }
+        if (event.target.closest("#downloadAgentReport")) {
+          downloadCsv("winner-prestige-team.csv", [["ชื่อ-นามสกุล", "เบอร์โทร", "LINE ID", "สถานะ", "Leads", "ติดต่อแล้ว", "นัดหมาย", "ปิดการขาย"], ...teamMembers.map((agent) => [agent.name, agent.phone, agent.line, agent.status, agent.leads, agent.contacted, agent.appointments, agent.closed])]);
+          showToast("ดาวน์โหลดรายงานแล้ว");
         }
         if (agentTab) {
           activeAgentTab = agentTab.dataset.agentTab;
@@ -1768,6 +1903,8 @@
           }
           renderRows();
           renderAgentCard();
+          saveLocalState();
+          showToast("อัปเดตสถานะลูกทีมแล้ว");
           document.querySelector("#agentManagePanel").hidden = true;
         }
         if (newAgentSubmit) {
@@ -1796,14 +1933,19 @@
           if (statusInput) statusInput.value = "เปิดรับ leads";
           document.querySelector("#addAgentPanel").hidden = true;
           renderRows();
+          saveLocalState();
+          showToast(`เพิ่มลูกทีม ${name} แล้ว`);
           document.querySelector("#agentCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
         if (deleteAgent) {
           if (teamMembers.length <= 1) return;
+          const removed = teamMembers[selectedAgentIndex]?.name || "ลูกทีม";
           teamMembers.splice(selectedAgentIndex, 1);
           selectedAgentIndex = Math.max(0, selectedAgentIndex - 1);
           activeAgentTab = "overview";
           renderRows();
+          saveLocalState();
+          showToast(`ลบ ${removed} แล้ว`);
         }
         if (targetButton) showView(targetButton.dataset.viewTarget);
       });
@@ -2190,28 +2332,32 @@
               alcohol: "ดื่มบ้าง"
             }));
 
-        const displayRows = getDisplayHealthRows(rows);
-        document.querySelector("#healthRows").innerHTML = displayRows.slice(0, 15).map((item, index) => {
+        const allDisplayRows = getDisplayHealthRows(rows);
+        const healthQuery = (document.querySelector("#healthSearchInput")?.value || "").trim().toLowerCase();
+        const visibleRows = allDisplayRows.map((item, originalIndex) => ({ item, originalIndex })).filter(({ item }) => {
+          return [item.name, item.phone, item.lineId, item.email].join(" ").toLowerCase().includes(healthQuery);
+        });
+        document.querySelector("#healthRows").innerHTML = visibleRows.slice(0, 15).map(({ item, originalIndex }, index) => {
           return `<tr>
             <td>${index + 1}</td>
             <td>${clean(item.name)}</td>
             <td>${clean(item.phone)}</td>
             <td>${clean(item.source)}</td>
             <td>${toThaiDate(item.timestamp)}</td>
-            <td><button class="mini-btn view-big detail-open" type="button" data-health-index="${index}">ดู</button></td>
+            <td><button class="mini-btn view-big detail-open" type="button" data-health-index="${originalIndex}">ดู</button></td>
           </tr>`;
         }).join("");
 
-        const total = displayRows.length;
+        const total = allDisplayRows.length;
         document.querySelector("#view-health .stat-card strong").textContent = total;
-        const genderCounts = countBy(displayRows, (item) => clean(item.gender));
-        const provinceCounts = countBy(displayRows, inferProvince);
-        const historyCounts = countBy(displayRows, (item) => hasHealthHistory(item) ? "มี" : "ไม่มี");
+        const genderCounts = countBy(allDisplayRows, (item) => clean(item.gender));
+        const provinceCounts = countBy(allDisplayRows, inferProvince);
+        const historyCounts = countBy(allDisplayRows, (item) => hasHealthHistory(item) ? "มี" : "ไม่มี");
         renderBarSet("#genderBars", Object.entries(genderCounts), total);
         renderBarSet("#provinceBars", Object.entries(provinceCounts).sort((a, b) => b[1] - a[1]).slice(0, 4), total);
         renderBarSet("#healthHistoryBars", Object.entries(historyCounts), total);
         const footer = document.querySelector("#view-health .table-wrap + div span:first-child");
-        if (footer) footer.textContent = `แสดง 15 รายการ`;
+        if (footer) footer.textContent = `แสดง ${Math.min(15, visibleRows.length)} จาก ${visibleRows.length} รายการ`;
         renderHealthDrawer(selectedHealthIndex);
       }
 
@@ -2384,6 +2530,7 @@
         if (syncStatus) {
           syncStatus.textContent = url ? "บันทึก Google Apps Script Web App URL แล้ว" : "ล้าง URL แล้ว ใช้ข้อมูลจากชีตกลางที่ดึงไว้";
         }
+        showToast(url ? "บันทึก Google Script URL แล้ว" : "ล้าง Google Script URL แล้ว");
       });
 
       document.querySelector("#syncFromSheet")?.addEventListener("click", async () => {
@@ -2393,6 +2540,7 @@
           centralLeads = centralLeadSnapshot;
           renderRows();
           if (syncStatus) syncStatus.textContent = "อัปเดตตารางจาก snapshot ของ FWD Leads Central Database แล้ว";
+          showToast("ใช้ข้อมูล snapshot ชั่วคราว");
           return;
         }
 
@@ -2409,13 +2557,29 @@
             item.status || item.Status || "New",
             item.assignedTo || item["Assigned To"] || ""
           ]);
+          const members = payload.teamMembers || payload.members || payload["Team Members"] || [];
+          if (Array.isArray(members) && members.length) {
+            teamMembers = members.map(normalizeTeamMember);
+          }
+          const healthRows = payload.health || payload.healthLeads || payload["Health WebApp Leads V2"] || [];
+          if (Array.isArray(healthRows) && healthRows.length) {
+            healthLeads = healthRows.map((item) => Array.isArray(item) ? normalizeHealthRow(item, {}) : item);
+            renderHealthRows();
+          }
           renderRows();
-          if (syncStatus) syncStatus.textContent = `อัปเดตจาก Google Script แล้ว ${centralLeads.length} รายการ`;
+          saveLocalState();
+          if (syncStatus) syncStatus.textContent = `อัปเดตจาก Google Script แล้ว Leads ${centralLeads.length} รายการ / Team Members ${teamMembers.length} คน`;
+          showToast("Sync Google Script สำเร็จ");
         } catch (error) {
           console.error(error);
           if (syncStatus) syncStatus.textContent = "ดึงจาก Google Script ไม่สำเร็จ ตรวจ URL/สิทธิ์ แล้วลองอีกครั้ง";
+          showToast("Sync ไม่สำเร็จ ตรวจ URL/สิทธิ์ Google Script");
         }
       });
+
+      document.querySelector("#healthSearchInput")?.addEventListener("input", () => renderHealthRows());
+      document.querySelector("#agentSearchInput")?.addEventListener("input", () => renderRows());
+      document.querySelector("#agentStatusFilter")?.addEventListener("change", () => renderRows());
 
       document.querySelector("#customerSearchInput")?.addEventListener("input", (event) => {
         renderCustomerSideLists(getDisplayHealthRows(healthLeads)[selectedHealthIndex], event.target.value);
@@ -2427,8 +2591,9 @@
         document.querySelector("#customerMiniList .customer-result")?.click();
       });
 
-      renderRows();
       healthLeads = healthSnapshot;
+      loadLocalState();
+      renderRows();
       renderHealthRows();
       renderCustomerSideLists(getDisplayHealthRows(healthLeads)[0]);
       loadHealthFromGoogleSheet();
