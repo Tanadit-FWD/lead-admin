@@ -1182,6 +1182,7 @@
             <p>ใช้พื้นที่นี้ใส่ URL ของ Google Apps Script Web App เพื่ออัปเดตตาราง Leads จากชีตกลาง</p>
             <div class="script-sync-grid">
               <input id="scriptWebAppUrl" placeholder="วาง Web App URL จาก Google Apps Script ที่นี่">
+              <input id="linePushTo" placeholder="LINE user/group ID สำหรับส่ง Flex จริง">
               <button class="btn" id="saveScriptUrl" type="button">บันทึก URL</button>
               <button class="btn primary" id="syncFromSheet" type="button">อัปเดตตาราง</button>
             </div>
@@ -2566,10 +2567,13 @@
       const scriptPanel = document.querySelector("#googleScriptPanel");
       const scriptTab = document.querySelector("#googleScriptTab");
       const scriptUrlInput = document.querySelector("#scriptWebAppUrl");
+      const linePushInput = document.querySelector("#linePushTo");
       const syncStatus = document.querySelector("#syncStatus");
       const savedScriptUrl = localStorage.getItem("fwdGoogleScriptUrl") || "";
+      const savedLinePushTo = localStorage.getItem("fwdLinePushTo") || "";
 
       if (scriptUrlInput) scriptUrlInput.value = savedScriptUrl;
+      if (linePushInput) linePushInput.value = savedLinePushTo;
       if (scriptTab && scriptPanel) {
         scriptTab.addEventListener("click", () => {
           scriptPanel.classList.toggle("active");
@@ -2578,11 +2582,13 @@
 
       document.querySelector("#saveScriptUrl")?.addEventListener("click", () => {
         const url = scriptUrlInput?.value.trim() || "";
+        const linePushTo = linePushInput?.value.trim() || "";
         localStorage.setItem("fwdGoogleScriptUrl", url);
+        localStorage.setItem("fwdLinePushTo", linePushTo);
         if (syncStatus) {
           syncStatus.textContent = url ? "บันทึก Google Apps Script Web App URL แล้ว" : "ล้าง URL แล้ว ใช้ข้อมูลจากชีตกลางที่ดึงไว้";
         }
-        showToast(url ? "บันทึก Google Script URL แล้ว" : "ล้าง Google Script URL แล้ว");
+        showToast(url ? "บันทึก Google Script URL / LINE target แล้ว" : "ล้าง Google Script URL แล้ว");
       });
 
       document.querySelector("#syncFromSheet")?.addEventListener("click", async () => {
