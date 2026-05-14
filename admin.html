@@ -1627,7 +1627,8 @@
         return centralLeads.length ? centralLeads : centralLeadSnapshot;
       }
 
-      const storageKey = "fwdLeadAdminStateV2";
+      const storageKey = "fwdLeadAdminStateV3";
+      const stateSchemaVersion = 3;
 
       function showToast(message) {
         let toast = document.querySelector("#appToast");
@@ -1643,12 +1644,13 @@
       }
 
       function saveLocalState() {
-        localStorage.setItem(storageKey, JSON.stringify({ centralLeads, teamMembers, healthLeads }));
+        localStorage.setItem(storageKey, JSON.stringify({ schemaVersion: stateSchemaVersion, centralLeads, teamMembers, healthLeads }));
       }
 
       function loadLocalState() {
         try {
           const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+          if (saved.schemaVersion !== stateSchemaVersion) return;
           if (Array.isArray(saved.centralLeads)) centralLeads = saved.centralLeads;
           if (Array.isArray(saved.teamMembers)) teamMembers = saved.teamMembers;
           if (Array.isArray(saved.healthLeads) && saved.healthLeads.length) healthLeads = saved.healthLeads;
@@ -1675,7 +1677,7 @@
         const text = String(contact || "");
         const phone = (text.match(/0\d[\d -]{7,}/) || text.match(/\d{8,}/) || [""])[0].replace(/\s+/g, "");
         const line = text.replace(/^LINE:\s*/i, "").replace(/^โทร\s*/i, "").trim();
-        return { phone: phone || text || "-", line: line || "-" };
+        return { phone: phone || "-", line: line || "-" };
       }
 
       function normalizeTeamMember(item, index = 0) {
@@ -1699,6 +1701,16 @@
           closed: Number(item.closed || item["ปิดการขาย"] || 0)
         };
       }
+
+      const teamMemberSheetSnapshot = [
+        { "Member ID": "tm-may", Name: "คุณเมย์", Contact: "LINE: may.fwd", Role: "Advisor", Status: "Active", "Active Lead Count": 1, "Created At": "5/14/2026 13:08:52", Note: "ตัวอย่างลูกทีม แก้ไขได้" },
+        { "Member ID": "tm-ton", Name: "คุณต้น", Contact: "โทร 082-111-2233", Role: "Advisor", Status: "Paused", "Active Lead Count": 0, "Created At": "5/14/2026 13:08:52", Note: "ตัวอย่างลูกทีม แก้ไขได้" },
+        { "Member ID": "lead-78b96d97-59fc-42cc-96b4-38f2d2d306a5", Name: "ธนดิษ", Contact: "Uf53dcd2dae09031c7300893b85f43016", Role: "Advisor", Status: "Active", "Active Lead Count": 0, "Created At": "5/10/2026 16:33:36", Note: "" },
+        { "Member ID": "lead-cf52a3a6-24f7-4b52-9219-2398d5677860", Name: "ธนดิษ", Contact: "jao-nine", Role: "Advisor", Status: "Active", "Active Lead Count": 0, "Created At": "5/10/2026 16:33:39", Note: "" },
+        { "Member ID": "lead-89828414-b9d9-4692-bdb9-9f73a70a9fed", Name: "หายไปไหน", Contact: "jao-nine", Role: "Advisor", Status: "Paused", "Active Lead Count": 0, "Created At": "5/10/2026 17:18:24", Note: "" },
+        { "Member ID": "lead-8f0b9560-5352-466c-9ddb-27dcc8ad617b", Name: "กลับมาแล้วหนึ่ง", Contact: "8165412354", Role: "Advisor", Status: "Active", "Active Lead Count": 0, "Created At": "5/10/2026 17:18:52", Note: "" }
+      ];
+      teamMembers = teamMemberSheetSnapshot.map(normalizeTeamMember);
 
       function lineShare(text) {
         window.open(`https://line.me/R/share?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
@@ -1735,15 +1747,42 @@
         URL.revokeObjectURL(url);
       }
 
+      function renderAgentStats() {
+        const cards = document.querySelectorAll("#view-agents .stat-grid .stat-card");
+        if (!cards.length) return;
+        const total = teamMembers.length;
+        const percent = (value) => total ? `${((value / total) * 100).toFixed(2)}%` : "0.00%";
+        const active = teamMembers.filter((agent) => agent.statusClass === "green").length;
+        const paused = teamMembers.filter((agent) => agent.statusClass === "yellow").length;
+        const waiting = teamMembers.filter((agent) => agent.statusClass === "blue").length;
+        const setCard = (index, value, caption) => {
+          const card = cards[index];
+          if (!card) return;
+          const strong = card.querySelector("strong");
+          const spans = card.querySelectorAll("span");
+          if (strong) strong.textContent = value;
+          if (spans[1]) spans[1].textContent = caption;
+        };
+        setCard(0, total, "ทั้งหมด 100%");
+        setCard(1, active, percent(active));
+        setCard(2, paused, percent(paused));
+        setCard(3, waiting, percent(waiting));
+      }
+
       function renderRows() {
         const leadRows = getLeadRows();
         const recruitRows = leadRows.filter((lead) => lead[3] === "Winner Prestige Leads");
+        const teamOptions = teamMembers.map((agent) => `<option value="${agent.name}">${agent.name}</option>`).join("");
         document.querySelector("#newLeadRows").innerHTML = recruitRows.map((lead, index) => `
           <tr>
             <td>${index + 1}</td><td>${lead[0]}</td><td>${lead[1]}</td><td>${lead[2]}</td><td>${lead[3]}</td><td>${lead[4]}</td>
             <td><select class="select"><option>เลือกคนดูแล</option><option>ธนัทธ์ ศรีสุข</option><option>จิราภรณ์ แก้วมณี</option></select></td>
             <td><div class="lead-actions"><button class="mini-btn submit" type="button" data-lead-id="${lead[7] || ""}">Submit</button><button class="mini-btn flex" type="button">ส่ง Flex</button></div></td>
           </tr>`).join("");
+
+        document.querySelectorAll("#newLeadRows select.select").forEach((select) => {
+          select.innerHTML = `<option value="">เลือกคนดูแล</option>${teamOptions}`;
+        });
 
         document.querySelector("#sourceLeadRows").innerHTML = sourceLeadSnapshot.map((lead, index) => {
           const statusClass = lead[6] === "Assigned" ? "green" : "blue";
@@ -1776,6 +1815,7 @@
             <td><div class="agent-actions"><button class="mini-btn agent-select" type="button" data-agent-index="${index}">ดู</button><button class="mini-btn agent-manage" type="button" data-agent-index="${index}">จัดการ</button></div></td>
           </tr>`;
         }).join("");
+        renderAgentStats();
         renderAgentCard();
       }
 

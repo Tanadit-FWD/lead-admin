@@ -53,7 +53,8 @@ function assignLead(payload) {
 function saveTeamMember(member) {
   const sheet = SpreadsheetApp.openById(CENTRAL_SPREADSHEET_ID).getSheetByName("Team Members");
   const id = member.memberId || `tm-${Utilities.getUuid()}`;
-  sheet.appendRow([id, member.name || "", member.contact || member.phone || "", member.role || "Advisor", member.status || "Active", member.activeLeadCount || 0, new Date(), member.note || ""]);
+  const status = normalizeTeamStatus_(member.status || "Active");
+  sheet.appendRow([id, member.name || "", member.contact || member.phone || "", member.role || "Advisor", status, member.activeLeadCount || 0, new Date(), member.note || ""]);
   appendActivity_("saveTeamMember", id, member.name || "");
   return { ok: true, memberId: id };
 }
@@ -66,9 +67,17 @@ function updateTeamStatus(memberId, status) {
   const statusCol = headers.indexOf("Status");
   const rowIndex = data.findIndex((row, index) => index > 0 && row[idCol] === memberId);
   if (rowIndex < 1) return { ok: false, error: "Member not found" };
-  sheet.getRange(rowIndex + 1, statusCol + 1).setValue(status || "Active");
-  appendActivity_("updateTeamStatus", memberId, status || "Active");
+  const nextStatus = normalizeTeamStatus_(status || "Active");
+  sheet.getRange(rowIndex + 1, statusCol + 1).setValue(nextStatus);
+  appendActivity_("updateTeamStatus", memberId, nextStatus);
   return { ok: true };
+}
+
+function normalizeTeamStatus_(status) {
+  const text = String(status || "").toLowerCase();
+  if (text.includes("paused") || text.includes("พัก")) return "Paused";
+  if (text.includes("inactive") || text.includes("ปิด")) return "Inactive";
+  return "Active";
 }
 
 function sendLineFlex(payload) {
